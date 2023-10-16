@@ -1,0 +1,6 @@
+hello_world:
+  dname: 'Hello World'
+  dir: 'hello_world'
+  runner: 'bash'
+  executable: 'run.sh'
+  config: 'config.yml'
