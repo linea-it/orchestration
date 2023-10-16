@@ -1,0 +1,61 @@
+#!/usr/bin/env python3
+
+import argparse
+import logging
+import time
+import yaml
+
+
+def setup_logger(name="pipeline-logger"):
+    """
+    Configures the logger for recording events and messages.
+
+    Returns:
+        logging.Logger: Configured logger instance.
+    """
+
+    logger = logging.getLogger(name)
+    logger.setLevel(logging.DEBUG)
+
+    formatter = logging.Formatter("%(asctime)s - %(levelname)s - %(message)s")
+
+    file_handler = logging.FileHandler("pipeline.log")
+    file_handler.setLevel(logging.DEBUG)
+    file_handler.setFormatter(formatter)
+
+    logger.addHandler(file_handler)
+
+    return logger
+
+
+def run(param):
+    """Run the Hello World pipeline
+
+    Args:
+        param (dict): Hello World parameters.
+    """
+
+    logger = setup_logger(name=__name__)
+    logger.info("Parameters: %s", param)
+
+    start_time_full = time.time()
+
+    logger.info("MESSAGE: %s", param.get("message"))
+    time.sleep(int(param.get("sleeptime", "2")))
+
+    logger.info("Time elapsed: %s", str(time.time() - start_time_full))
+
+
+if __name__ == "__main__":
+    # Create the parser and add arguments
+    parser = argparse.ArgumentParser()
+    parser.add_argument(dest="config_path", help="yaml config path")
+
+    args = parser.parse_args()
+    config_path = args.config_path
+
+    with open(config_path, encoding="utf-8") as _file:
+        pipe_config = yaml.load(_file, Loader=yaml.FullLoader)
+
+    # Run Hello World pipeline
+    run(pipe_config)
