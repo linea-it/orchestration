@@ -1,0 +1,7 @@
+name: orchestration
+channels:
+  - defaults
+  - conda-forge
+dependencies:
+  - python=3.10.8
+  - uwsgi=2.0.22

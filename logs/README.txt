@@ -1,0 +1,1 @@
+# Directory to store logs in the development environment
