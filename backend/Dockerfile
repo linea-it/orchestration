@@ -9,10 +9,8 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # # This option has no effect on the stdin stream.
 ENV PYTHONUNBUFFERED=1
 
-# Create Groups: photoz and conda
-# Grupo photoz existe no ambiente do linea
-RUN groupadd -r photoz --gid 15013 \
-    && groupadd -r conda --gid 900
+# Create Group: conda
+RUN groupadd -r conda --gid 900
 
 # Instalacao Miniconda
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
