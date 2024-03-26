@@ -14,6 +14,7 @@ RUN pip install --upgrade pip wheel setuptools \
     && pip --disable-pip-version-check --no-cache-dir install -r /tmp/pip-tmp/requirements.txt \
     && rm -rf /tmp/pip-tmp
 
+ENV BASE_DIR=/app
 COPY --chmod=0775 ./backend/sh/entrypoint.sh /entrypoint.sh
 
 ENTRYPOINT [ "/entrypoint.sh" ]

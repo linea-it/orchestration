@@ -1,10 +1,13 @@
 #!/bin/bash --login
 
-source /app/sh/env.sh
-
 set -o errexit
 set -o nounset
 set -o pipefail
+
+envfile="${BASE_DIR}/sh/env.sh"
+
+# shellcheck disable=SC1090
+source "${envfile}"
 
 worker_ready() {
     celery --app orchestration inspect ping

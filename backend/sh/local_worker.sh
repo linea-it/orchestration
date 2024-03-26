@@ -1,10 +1,13 @@
 #!/bin/bash --login
 
-source /app/sh/env.sh
-
 set -o errexit
 set -o pipefail
 set -o nounset
+
+envfile="${BASE_DIR}/sh/env.sh"
+
+# shellcheck disable=SC1090
+source "${envfile}"
 
 host=$(hostname)
 
@@ -17,6 +20,6 @@ rm -f '/tmp/local-celery.pid'
 celery -A orchestration worker -Q local,"local.${host}" \
     -l INFO \
     --pidfile="/tmp/local-%n.pid" \
-    --logfile="/logs/local.${host}%I.log" \
+    --logfile="${LOG_DIR}/local.${host}%I.log" \
     --pool="processes" \
     --concurrency=2

@@ -39,8 +39,8 @@ CSRF_COOKIE_NAME = "orchestration.csrftoken"
 
 # rabbitmq
 
-AMQP_HOST = "rabbitmq"
-AMQP_PORT = "5672"
+AMQP_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
+AMQP_PORT = os.getenv("RABBITMQ_PORT","5672")
 AMQP_USER = os.getenv("RABBITMQ_DEFAULT_USER", "orcadmin")
 AMQP_PASS = os.getenv("RABBITMQ_DEFAULT_PASS", "adminorc")
 AMQP_VHOST = os.getenv("RABBITMQ_DEFAULT_VHOST", "/")

@@ -1,7 +1,5 @@
 #!/bin/bash --login
 
-# source /app/sh/env.sh
-
 set -o errexit
 set -o pipefail
 set -o nounset
@@ -12,5 +10,5 @@ rm -f '/tmp/slurm-celery.pid'
 celery -A orchestration worker \
     -l INFO \
     --pidfile="/tmp/slurm-%n.pid" \
-    --logfile="/logs/slurm-%n%I.log" \
+    --logfile="${LOG_DIR}/slurm-%n%I.log" \
     --pool="solo" 

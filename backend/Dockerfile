@@ -68,30 +68,33 @@ ARG USERNAME=app
 ARG USERID=1000
 ARG GROUPID=1000
 
+ENV BASE_DIR /app
+
 RUN groupadd --gid ${GROUPID} $USERNAME \
     && useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} \
     && usermod -a -G 900 ${USERNAME} \
-    && mkdir -p /app \
-    && chown -R ${USERID}:${GROUPID} /app 
-
-# RUN /bin/bash --login -c "conda init bash \
-#     && source ~/.bashrc \
-#     && conda activate orchestration"
+    && mkdir -p ${BASE_DIR} \
+    && chown -R ${USERID}:${GROUPID} ${BASE_DIR}
 
 # Copy app files into container
-WORKDIR /app
-COPY . /app
+WORKDIR $BASE_DIR
+COPY . $BASE_DIR
 
 COPY --chmod=0775 ./sh/entrypoint.sh /entrypoint.sh
-COPY --chmod=0775 ./sh/start.sh /start.sh
-COPY --chmod=0775 ./sh/local_worker.sh /local_worker.sh
-COPY --chmod=0775 ./sh/slurm_worker.sh /slurm_worker.sh
-COPY --chmod=0775 ./sh/flower.sh /flower.sh
+# COPY --chmod=0775 ./sh/start.sh /start.sh
+# COPY --chmod=0775 ./sh/local_worker.sh /local_worker.sh
+# COPY --chmod=0775 ./sh/slurm_worker.sh /slurm_worker.sh
+# COPY --chmod=0775 ./sh/flower.sh /flower.sh
 
 # Switch to non-priviliged user and run app
 USER $USERNAME
 RUN /bin/bash --login -c "conda init bash \
-    && echo 'source /app/sh/env.sh' >> ~/.bashrc \
+    && echo 'source ${BASE_DIR}/sh/env.sh' >> ~/.bashrc \
     && source ~/.bashrc"
+
+RUN mkdir -p ${BASE_DIR}/django_static \
+    ${BASE_DIR}/django_static/rest_framework \
+    ${BASE_DIR}/django_static/admin \
+    && chmod -R g+w ${BASE_DIR}/django_static
 
 ENTRYPOINT [ "/entrypoint.sh" ]
