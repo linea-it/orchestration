@@ -10,3 +10,4 @@ rabbitmq/*
 !rabbitmq/enabled_plugins
 .env
 *.bak
+docker-compose.yml

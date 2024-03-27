@@ -1,4 +1,7 @@
 from pydantic import BaseModel
+import os
+
+DATASETS_DIR = os.getenv("DATASETS_DIR", "/datasets")
 
 
 class Instance(BaseModel):
@@ -24,8 +27,8 @@ class Local(BaseModel):
 
 
 class Inputs(BaseModel):
-  photo: str = "/datasets/DatasetA"
-  specz: str = "/datasets/DatasetB"
+  photo: str = f"{DATASETS_DIR}/DatasetA"
+  specz: str = f"{DATASETS_DIR}/DatasetB"
 
 
 class Executor(BaseModel):

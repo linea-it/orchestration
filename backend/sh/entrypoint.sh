@@ -7,8 +7,4 @@ set -o pipefail
 # exits if any of your variables is not set
 set -o nounset
 
-echo "HOST: "$HOST
-echo "LOG_DIR: "$LOG_DIR
-echo "BASE_DIR: "$BASE_DIR
-
 exec "$@"

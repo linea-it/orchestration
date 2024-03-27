@@ -64,21 +64,30 @@ COPY --chown=:conda --chmod=775 --from=env_base /opt/conda/envs/orchestration /o
 
 # add user so we can run things as non-root
 # https://code.visualstudio.com/remote/advancedcontainers/add-nonroot-user
-ARG USERNAME=app
+ARG USERNAME=orch
 ARG USERID=1000
 ARG GROUPID=1000
+ARG BASEDIR=/app
 
-ENV BASE_DIR /app
+ENV BASE_DIR ${BASEDIR}
+
+RUN mkdir -p ${BASE_DIR}
+
+# Copy app files into container
+WORKDIR $BASE_DIR
+COPY . $BASE_DIR
+
+RUN mkdir -p ${BASE_DIR}/django_static \
+    ${BASE_DIR}/django_static/rest_framework \
+    ${BASE_DIR}/django_static/admin \
+    ${BASE_DIR}/core/migrations \
+    && chmod -R g+w ${BASE_DIR}
 
 RUN groupadd --gid ${GROUPID} $USERNAME \
     && useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} \
     && usermod -a -G 900 ${USERNAME} \
     && mkdir -p ${BASE_DIR} \
     && chown -R ${USERID}:${GROUPID} ${BASE_DIR}
-
-# Copy app files into container
-WORKDIR $BASE_DIR
-COPY . $BASE_DIR
 
 COPY --chmod=0775 ./sh/entrypoint.sh /entrypoint.sh
 # COPY --chmod=0775 ./sh/start.sh /start.sh
@@ -91,10 +100,5 @@ USER $USERNAME
 RUN /bin/bash --login -c "conda init bash \
     && echo 'source ${BASE_DIR}/sh/env.sh' >> ~/.bashrc \
     && source ~/.bashrc"
-
-RUN mkdir -p ${BASE_DIR}/django_static \
-    ${BASE_DIR}/django_static/rest_framework \
-    ${BASE_DIR}/django_static/admin \
-    && chmod -R g+w ${BASE_DIR}/django_static
 
 ENTRYPOINT [ "/entrypoint.sh" ]

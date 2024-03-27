@@ -128,10 +128,12 @@ WSGI_APPLICATION = "orchestration.wsgi.application"
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
 
+DB_DIR = os.getenv("DB_DIR", BASE_DIR)
+
 DATABASES = {
     "default": {
         "ENGINE": os.getenv("DB_ENGINE", "django.db.backends.sqlite3"),
-        "NAME": os.getenv("DB_DATABASE", os.path.join(BASE_DIR, "db.sqlite3")),
+        "NAME": os.getenv("DB_DATABASE", os.path.join(DB_DIR, "db.sqlite3")),
         "USER": os.getenv("DB_USER", "orchadmin"),
         "PASSWORD": os.getenv("DB_PASSWORD", "adminorch"),
         "HOST": os.getenv("DB_HOST", ""),
