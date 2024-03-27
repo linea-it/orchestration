@@ -14,7 +14,8 @@ app = Celery('orchestration')
 app.config_from_object('django.conf:settings', namespace='CELERY')
 
 app.conf.task_routes = {
-    "core.executors.local.tasks.*": {'queue': 'local'}
+    "core.executors.local.tasks.*": {'queue': 'local'},
+    "core.executors.slurm.tasks.*": {'queue': 'local'}
 }
 
 # Load task modules from all registered Django apps.

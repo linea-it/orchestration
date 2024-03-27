@@ -20,7 +20,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
 # SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = "django-insecure-6so!1kq=d-6f1dhy)#h*1$n4+azs9_piq8z4*u-t&2lk1ok!$k"
+SECRET_KEY = os.getenv("SECRET_KEY", "Z-cVO6l8catnpijVIKXcwwaKeGJTzJ2hiItn3lw2a4I")
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space
 # between each. For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
@@ -197,11 +197,11 @@ LOGGING = {
             "backupCount": 5,
             "formatter": "standard",
         },
-        "local": {
+        "orchestration": {
             "class": "logging.handlers.RotatingFileHandler",
-            "filename": f"{LOG_DIR}/local.log",
+            "filename": f"{LOG_DIR}/orchestration.log",
             "maxBytes": 1024 * 1024 * 5,  # 5 MB
-            "backupCount": 5,
+            "backupCount": 3,
             "formatter": "standard",
         },
     },
@@ -214,8 +214,8 @@ LOGGING = {
             "handlers": ["default"],
             "level": LOGGING_LEVEL,
         },
-        "local": {
-            "handlers": ["local"],
+        "orchestration": {
+            "handlers": ["orchestration"],
             "level": LOGGING_LEVEL,
         },
     },

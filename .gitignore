@@ -11,3 +11,4 @@ rabbitmq/*
 .env
 *.bak
 docker-compose.yml
+db.sqlite3
