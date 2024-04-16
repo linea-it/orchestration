@@ -8,7 +8,7 @@ if [ ! -d "$PIPELINES_DIR" ]; then
 fi
 
 PIPE_BASE="$PIPELINES_DIR/cross_lsdb_dev"
-HASENV=`conda env list | grep pipe_cross_lsdb_dev`
+HASENV=`conda env list | grep 'pipe_cross_lsdb_dev '`
 
 if [ -z "$HASENV" ]; then
     echo "Create virtual environment..."

@@ -41,41 +41,52 @@ def start(process_id, sbatch_file, cwd):
 
 
 @shared_task
-@task_revoked.connect(sender=start)
-def task_revoked_handler(request=None, **kwargs):
-    """Responsible for handling the task revoke process."""
-    task_id = request.id
+def status(job_id):
+    return get_status(job_id)
 
-    def on_terminate(proc):
-        mesg = f"Child PID {proc.pid} terminated"
-        if proc.returncode is not None:
-            mesg = f" with exit code {proc.returncode}"
 
-        logger.debug(mesg)
+@shared_task
+def stop(process_id):
+
+    process = Process.objects.get(id=process_id)
+    pstatus = get_status(process.pid)
+
+    if not pstatus:
+        logger.info("JobId %s not running!")
+        return pstatus
 
     try:
-        process_id = request.args[0]
-        process = Process.objects.get(id=process_id)
-        sysproc = psutil.Process(process.pid)
-        children = sysproc.children(recursive=True)
-        children.append(sysproc)
+        cmd = ["scancel", "--quiet", str(process.pid)]
+        logger.info("Stopping process[%s]: JobID %s", process_id, process.pid)
+        result = subprocess.run(cmd, stdout=subprocess.PIPE)
+        success_msg = 'has been revoked'
+        stdout = result.stdout.decode('utf-8')
+        if success_msg in stdout:
+            logger.info(stdout)
+            process.status = 4  # number representing 'stopped' in db
+            process.save()
+        else:
+            logger.error("Error: %s", result.stderr)
+            logger.error("Process[%s] stop failed: %s", process_id, process.pid)
+    except Exception as err:
+        logger.error("Error: %s", err)
+        logger.error("Process[%s] stop failed: %s", process_id, process.pid)
 
-        for child in children:
-            child.terminate()
+    return process.status
 
-        _, alive = psutil.wait_procs(children, timeout=5, callback=on_terminate)
 
-        for proc in alive:
-            proc.kill()
-
-        time.sleep(0.5)
-        process.status = 4  # number representing 'revoked' in db
-        process.save()
-        logger.info("Task stopped: %s", task_id)
-    except Exception as _:
-        process_id = request.args[0]
-        process = Process.objects.get(id=process_id)
-        process.status = 5  # number representing 'failed' in db
-        process.save()
-        logger.info("Task stop failed : %s", task_id)
-        logger.exception()
+def get_status(job_id):
+    try:
+        cmd = ["squeue", "--job", str(job_id), "-o", '"%T"', "|", "tail", "-1"]
+        result = subprocess.run(cmd, stdout=subprocess.PIPE)
+        error_msg = 'Invalid job id specified'
+        stdout = result.stdout.decode('utf-8')
+        if error_msg in stdout:
+            logger.error("Error: %s", result.stderr)
+            return None
+        else:
+            logger.info("JobId %s status: %s", job_id, stdout)
+            return stdout
+    except Exception as err:
+        logger.error("Error: %s", err)
+        return None

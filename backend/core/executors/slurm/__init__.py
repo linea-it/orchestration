@@ -8,7 +8,7 @@ class ExecutorSlurm(ExecutorBase):
 
     def __init__(self, process_id) -> None:
         super().__init__(process_id)
-    
+
     def submit(self):
         logger.info("Preparing process...")
 
@@ -17,8 +17,7 @@ class ExecutorSlurm(ExecutorBase):
         logger.info("-> Pipeline: %s", self.title)
         logger.info("-> Command: %s", self.cmd)
         logger.info("Submitted - Process ID: %s", self.process_id)
-        return sbatch_path
-        # return tasks.start.apply_async([self.process_id, sbatch_path, self.cwd])
+        return tasks.start.apply_async([self.process_id, sbatch_path, str(self.cwd)])
 
     def __create_sbatch_file(self):
         stemp = pathlib.Path(self.pipeline_path, "sbatch.template")
@@ -40,5 +39,6 @@ class ExecutorSlurm(ExecutorBase):
 
 
     def stop(self):
-        pass
+        logger.info("Stopping JobID: %s", self.process.pid)
+        return tasks.stop.apply_async([self.process.pid])
 
