@@ -10,6 +10,6 @@ rabbitmq/*
 !rabbitmq/enabled_plugins
 .env
 *.bak
-*docker-compose.yml
-*pipelines.yaml
 db.sqlite3
+pipelines/pipelines.yaml
+docker-compose.yml

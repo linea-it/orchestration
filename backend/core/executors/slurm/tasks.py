@@ -1,11 +1,8 @@
 from core.models import Process
 from celery import shared_task
-from celery.signals import task_revoked
 import logging
 import socket
 import subprocess
-import psutil
-import time
 
 logger = logging.getLogger()
 

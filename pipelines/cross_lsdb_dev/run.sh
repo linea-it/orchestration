@@ -32,6 +32,9 @@ echo "Installing pipeline..."
 set -xe
 
 # Run the Python code with the given argument
-run-crossmatch $ARGS || { echo "Failed to run-crossmatch"; exit 1; }
+# run-crossmatch $ARGS || { echo "Failed to run-crossmatch"; exit 1; }
+run-crossmatch $ARGS
+
+echo $? >> return.code
 
 echo "Done."

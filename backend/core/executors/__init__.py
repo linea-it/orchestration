@@ -105,8 +105,17 @@ class ExecutorBase:
     def task_id(self):
         return self.__process.task_id
 
+    @property
+    def process_db(self):
+        return self.__process
+
     def submit(self):
         pass
     
     def stop(self):
         pass
+
+    def finish(self):
+        pass
+
+

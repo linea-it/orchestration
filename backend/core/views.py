@@ -132,6 +132,26 @@ class ProcessViewSet(viewsets.ModelViewSet):
         
         logger.info("Process[%s]: %s", str(process), data)
         return Response(data, status=status.HTTP_200_OK)
+    
+
+    @action(methods=["Post", "Get"], detail=True)
+    def finish(self, request, **kwargs):
+        """Finish processing"""
+
+        try:
+            instance = self.get_object()
+            process = Process.objects.get(pk=instance.pk)
+            Executor = load_executor(process.executor)
+            executor = Executor(process.pk)
+            executor.finish()
+            data = self.get_serializer(instance=process).data
+            code_status = status.HTTP_200_OK
+        except Exception as err:
+            data = {"error": str(err)}
+            code_status = status.HTTP_500_INTERNAL_SERVER_ERROR
+        
+        logger.info("Process[%s]: %s", str(process), data)
+        return Response(data, status=code_status)
 
 
     @action(methods=["Post", "Get"], detail=True)

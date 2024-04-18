@@ -12,7 +12,7 @@
 {cmd}
 
 if [ -z "$ORCHESTRATION_URL" ]; then
-    echo "Finishing process {process_dir}..."
-    curl -X GET "$ORCHESTRATION_URL/processes/finish?process_dir={process_dir}"
+    echo "Finishing process {process_id}..."
+    curl -X GET "$ORCHESTRATION_URL/processes/{process_id}/finish"
     echo "Done!"
 fi
