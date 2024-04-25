@@ -54,11 +54,12 @@ CELERY_BROKER_URL = (
 )
 CELERY_CACHE_BACKEND = "django-cache"
 CELERY_RESULT_BACKEND = "django-db"
+CELERY_RESULT_EXTENDED = True
 CELERY_TIMEZONE = "UTC"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-
+# CELERY_BEAT_SCHEDULE = "django_celery_beat.schedulers:DatabaseScheduler"
 
 # Application definition
 
@@ -71,6 +72,7 @@ INSTALLED_APPS = [
     "django.contrib.staticfiles",
     "corsheaders",
     "rest_framework",
+    "django_celery_beat",
     "django_celery_results",
     "core",
 ]

@@ -4,6 +4,9 @@ import json
 import importlib
 import sys
 from django.conf import settings
+import logging
+
+logger = logging.getLogger()
 
 
 def get_pipeline(name):
@@ -57,3 +60,13 @@ def validate_json(data):
 def validate_config(config):
     if not config: return True
     return validate_json(config) and isinstance(json.loads(config), dict)
+
+
+def get_returncode(process_dir):
+    try:
+        with open(f"{process_dir}/return.code", encoding="utf-8") as _file:
+            content = _file.readline()
+            return int(content.replace('\n',''))
+    except Exception as err:
+        logger.error(f"Error when redeeming return code: {err}")
+        return -1

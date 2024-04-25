@@ -11,14 +11,14 @@ source "${envfile}"
 
 host=$(hostname)
 
-sleep 10
+sleep 5
 
 echo "Starting Celery Worker"
 
-rm -f '/tmp/local-celery*.pid'
-rm -f '/tmp/local-celery.pid'
+rm -rf /tmp/local-*.pid
+
 celery -A orchestration worker -Q local,"local.${host}" \
-    -l INFO \
+    -l "${LOGGING_LEVEL}" \
     --pidfile="/tmp/local-%n.pid" \
     --logfile="${LOG_DIR}/local.${host}%I.log" \
     --pool="processes" \
