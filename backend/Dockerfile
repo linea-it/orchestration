@@ -91,6 +91,7 @@ RUN groupadd --gid ${GROUPID} $USERNAME \
 
 COPY --chmod=0775 ./sh/entrypoint.sh /entrypoint.sh
 # COPY --chmod=0775 ./sh/start.sh /start.sh
+# COPY --chmod=0775 ./sh/beat.sh /beat.sh
 # COPY --chmod=0775 ./sh/local_worker.sh /local_worker.sh
 # COPY --chmod=0775 ./sh/slurm_worker.sh /slurm_worker.sh
 # COPY --chmod=0775 ./sh/flower.sh /flower.sh

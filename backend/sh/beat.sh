@@ -9,7 +9,7 @@ envfile="${BASE_DIR}/sh/env.sh"
 # shellcheck disable=SC1090
 source "${envfile}"
 
-echo "Starting Celery Worker"
+echo "Starting Celery Beat"
 
 rm -rf /tmp/celerybeat.pid
 

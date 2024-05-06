@@ -1,7 +1,7 @@
 from core.executors import ExecutorBase, logger
 from core.executors.slurm import tasks
 import pathlib
-import datetime
+# from django.utils.timezone import now
 
 
 class ExecutorSlurm(ExecutorBase):
@@ -39,37 +39,37 @@ class ExecutorSlurm(ExecutorBase):
 
 
     def stop(self):
-        logger.info("Stopping JobID: %s", self.process.pid)
-        return tasks.stop.apply_async([self.process.pid])
+        logger.info("Stopping JobID: %s", self.process_db.pid)
+        return tasks.stop.apply_async([self.process_id])
     
 
-    def finish(self):
-        if self.process_db.ended_at and self.process_db.status not in (2):
-            msg = f"Process ID[{self.process_id}] has already been finished."
-            logger.info(msg)
-            return msg
-        
-        logger.info(
-            "Finishing... Process ID: %s",
-            str(self.process_id)
-        )
-        retcode_path = pathlib.Path(self.cwd, 'return.code')
-
-        assert retcode_path.is_file(), f"return.code not found."
-
-        with open(retcode_path, "r", encoding="UTF-8") as _retfile:
-            retcode = _retfile.readline()
-            retcode = int(retcode.replace('\n',''))
-
-        self.process_db.ended_at = datetime.datetime.now()
-
-        if retcode == 0:
-            logger.info("Process[%s] succeeded.", self.process_id)
-            self.process_db.status = 0  # number representing 'success' in db
-        else:
-            logger.info("Process[%s] failed.", self.process_id)
-            self.process_db.status = 5  # number representing 'failure' in db
-
-        self.process_db.save()
-        return f"Process ID[{self.process_id}] finished!"
+#    def finish(self):
+#        if self.process_db.ended_at and self.process_db.status not in (2):
+#            msg = f"Process ID[{self.process_id}] has already been finished."
+#            logger.info(msg)
+#            return msg
+#        
+#        logger.info(
+#            "Finishing... Process ID: %s",
+#            str(self.process_id)
+#        )
+#        retcode_path = pathlib.Path(self.cwd, 'return.code')
+#
+#        assert retcode_path.is_file(), f"return.code not found."
+#
+#        with open(retcode_path, "r", encoding="UTF-8") as _retfile:
+#            retcode = _retfile.readline()
+#            retcode = int(retcode.replace('\n',''))
+#
+#        self.process_db.ended_at = now()
+#
+#        if retcode == 0:
+#            logger.info("Process[%s] succeeded.", self.process_id)
+#            self.process_db.status = 0  # number representing 'success' in db
+#        else:
+#            logger.info("Process[%s] failed.", self.process_id)
+#            self.process_db.status = 5  # number representing 'failure' in db
+#
+#        self.process_db.save()
+#        return f"Process ID[{self.process_id}] finished!"
 

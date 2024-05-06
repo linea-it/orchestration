@@ -5,7 +5,8 @@ import logging
 import socket
 import subprocess
 import psutil
-import time, datetime
+import time
+from django.utils.timezone import now
 
 logger = logging.getLogger()
 
@@ -28,7 +29,7 @@ def start(process_id, cmd, args=None):
     process.worker = socket.gethostname()
     process.pid = proc_child.pid
     process.status = 2  # number representing 'running' in db
-    process.started_at = datetime.datetime.now()
+    process.started_at = now()
     process.save()
 
     logger.info("-> system pid: %s", proc_child.pid)
@@ -41,7 +42,7 @@ def start(process_id, cmd, args=None):
         logger.info("Process[%s] failed.", process_id)
         process.status = 5  # number representing 'failure' in db
 
-    process.ended_at = datetime.datetime.now()
+    process.ended_at = now()
     process.save()
 
 

@@ -34,8 +34,8 @@ class ExecutorLocal(ExecutorBase):
         )
         app.control.terminate(self.task_id)
 
-    def finish(self):
-        return "ExecutorLocal does not need this functionality"
+#    def finish(self):
+#        return "ExecutorLocal does not need this functionality"
 
     
 

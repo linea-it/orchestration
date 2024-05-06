@@ -21,7 +21,7 @@ app.conf.task_routes = {
 app.conf.beat_schedule = {
     "slurm-check-finish": {
         "task": "core.executors.slurm.tasks.check_running_processes",
-        "schedule": 30.0,
+        "schedule": 60.0,
     },
 }
 app.conf.timezone = "UTC"

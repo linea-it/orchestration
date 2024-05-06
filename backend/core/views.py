@@ -161,9 +161,15 @@ class ProcessViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             process = Process.objects.get(pk=instance.pk)
+            data = self.get_serializer(instance=process).data
+
             if process.status in (3, 4):
-                data = self.get_serializer(instance=process).data
-                msg = f"Process[{str(process)}] has already been marked to be stopped."
+                msg = f"Process[{process}] has already been marked to be stopped."
+                logger.info(msg)
+                return Response({"message": msg}, status=status.HTTP_200_OK)
+
+            if process.status in (0, 5):
+                msg = f"Process[{process}] has already finished. status={process.status}"
                 logger.info(msg)
                 return Response({"message": msg}, status=status.HTTP_200_OK)
 
