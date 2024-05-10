@@ -83,18 +83,18 @@ RUN mkdir -p ${BASE_DIR}/django_static \
     ${BASE_DIR}/core/migrations \
     && chmod -R g+w ${BASE_DIR}
 
-RUN groupadd --gid ${GROUPID} $USERNAME \
-    && useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} \
-    && usermod -a -G 900 ${USERNAME} \
-    && mkdir -p ${BASE_DIR} \
-    && chown -R ${USERID}:${GROUPID} ${BASE_DIR}
+# Create groups: for LIneA deploy (39216 lsst) and container
+RUN groupadd --gid 39216 lsst \
+    && groupadd --gid ${GROUPID} $USERNAME
+
+# Create users: for LIneA deploy (10013 orchestrator) and container
+RUN useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} \
+    && useradd --uid 10013 --gid 39216 --shell /bin/bash \
+    && usermod -a -G 10013,900 ${USERNAME} \
+    && usermod -a -G ${GROUPID},900 orchestrator \
+    && chown -R 10013:${GROUPID} ${BASE_DIR}
 
 COPY --chmod=0775 ./sh/entrypoint.sh /entrypoint.sh
-# COPY --chmod=0775 ./sh/start.sh /start.sh
-# COPY --chmod=0775 ./sh/beat.sh /beat.sh
-# COPY --chmod=0775 ./sh/local_worker.sh /local_worker.sh
-# COPY --chmod=0775 ./sh/slurm_worker.sh /slurm_worker.sh
-# COPY --chmod=0775 ./sh/flower.sh /flower.sh
 
 # Switch to non-priviliged user and run app
 USER $USERNAME

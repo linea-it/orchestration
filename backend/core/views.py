@@ -11,6 +11,8 @@ from django.db import transaction
 from rest_framework import exceptions, status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
+from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+
 
 logger = logging.getLogger("main")
 
@@ -18,6 +20,7 @@ logger = logging.getLogger("main")
 class ProcessViewSet(viewsets.ModelViewSet):
     queryset = Process.objects.all()
     serializer_class = ProcessSerializer
+    permission_classes = [TokenHasReadWriteScope]
     http_method_names = ["get", "post", "head", "options"]
     search_fields = [
         "pipeline",

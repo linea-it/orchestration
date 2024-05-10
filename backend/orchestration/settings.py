@@ -19,9 +19,6 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/5.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = os.getenv("SECRET_KEY", "Z-cVO6l8catnpijVIKXcwwaKeGJTzJ2hiItn3lw2a4I")
-
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space
 # between each. For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(
@@ -38,7 +35,6 @@ CSRF_COOKIE_NAME = "orchestration.csrftoken"
 
 
 # rabbitmq
-
 AMQP_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
 AMQP_PORT = os.getenv("RABBITMQ_PORT","5672")
 AMQP_USER = os.getenv("RABBITMQ_DEFAULT_USER", "orcadmin")
@@ -47,7 +43,6 @@ AMQP_VHOST = os.getenv("RABBITMQ_DEFAULT_VHOST", "/")
 
 
 # Celery Configuration Options
-
 
 CELERY_BROKER_URL = (
     f"amqp://{AMQP_USER}:{AMQP_PASS}@{AMQP_HOST}:{AMQP_PORT}{AMQP_VHOST}"
@@ -59,7 +54,7 @@ CELERY_TIMEZONE = "UTC"
 CELERY_BROKER_CONNECTION_RETRY_ON_STARTUP = True
 CELERY_TASK_TRACK_STARTED = True
 CELERY_TASK_TIME_LIMIT = 30 * 60
-# CELERY_BEAT_SCHEDULE = "django_celery_beat.schedulers:DatabaseScheduler"
+
 
 # Application definition
 
@@ -74,12 +69,24 @@ INSTALLED_APPS = [
     "rest_framework",
     "django_celery_beat",
     "django_celery_results",
+    "oauth2_provider",
     "core",
 ]
 
+OAUTH2_PROVIDER = {
+    "SCOPES": {'read': 'Read scope', 'write': 'Write scope'},
+    "ACCESS_TOKEN_EXPIRE_SECONDS": 36000,
+}
+
 REST_FRAMEWORK = {
-    # "DEFAULT_AUTHENTICATION_CLASSES": [],
-    # "DEFAULT_PERMISSION_CLASSES": [],
+    "DEFAULT_AUTHENTICATION_CLASSES": (
+        "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
+        "rest_framework.authentication.BasicAuthentication",
+        "rest_framework.authentication.SessionAuthentication",
+    ),
+    "DEFAULT_PERMISSION_CLASSES": (
+        "rest_framework.permissions.IsAuthenticated",
+    ),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "DEFAULT_FILTER_BACKENDS": [
         "rest_framework.filters.SearchFilter",
@@ -88,7 +95,10 @@ REST_FRAMEWORK = {
     "PAGE_SIZE": 10,
 }
 
+CORS_ORIGIN_ALLOW_ALL = True
+
 MIDDLEWARE = [
+    "corsheaders.middleware.CorsMiddleware",
     "django.middleware.security.SecurityMiddleware",
     "django.contrib.sessions.middleware.SessionMiddleware",
     "django.middleware.common.CommonMiddleware",
@@ -118,16 +128,6 @@ TEMPLATES = [
 
 WSGI_APPLICATION = "orchestration.wsgi.application"
 
-
-# # Database
-# # https://docs.djangoproject.com/en/5.0/ref/settings/#databases
-
-# DATABASES = {
-#     "default": {
-#         "ENGINE": "django.db.backends.sqlite3",
-#         "NAME": BASE_DIR / "db.sqlite3",
-#     }
-# }
 
 # Database
 # https://docs.djangoproject.com/en/4.0/ref/settings/#databases
@@ -173,16 +173,19 @@ TIME_ZONE = "UTC"
 USE_I18N = True
 USE_TZ = True
 
+
 # Static files (CSS, JavaScript, Images)
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = "/django_static/"
 STATIC_ROOT = os.path.join(BASE_DIR, "django_static")
 
+
 # Default primary key field type
 # https://docs.djangoproject.com/en/5.0/ref/settings/#default-auto-field
 
 DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
+
 
 # Logging settings
 
