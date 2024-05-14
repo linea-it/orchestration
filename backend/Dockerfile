@@ -88,11 +88,11 @@ RUN groupadd --gid 39216 lsst \
     && groupadd --gid ${GROUPID} $USERNAME
 
 # Create users: for LIneA deploy (10013 orchestrator) and container
-RUN useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} \
-    && useradd --uid 10013 --gid 39216 --shell /bin/bash \
-    && usermod -a -G 10013,900 ${USERNAME} \
-    && usermod -a -G ${GROUPID},900 orchestrator \
-    && chown -R 10013:${GROUPID} ${BASE_DIR}
+RUN useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} 
+RUN useradd --uid 10013 --gid 39216 --shell /bin/bash --create-home orchestrator
+RUN usermod -a -G 39216,900 ${USERNAME} 
+RUN usermod -a -G ${GROUPID},900 orchestrator 
+RUN chown -R 10013:${GROUPID} ${BASE_DIR}
 
 COPY --chmod=0775 ./sh/entrypoint.sh /entrypoint.sh
 
