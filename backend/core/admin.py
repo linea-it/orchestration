@@ -11,4 +11,6 @@ class ProcessAdmin(admin.ModelAdmin):
         "user",
     )
 
+    exclude = ["path"]
+
     search_fields = ("pipeline",)
