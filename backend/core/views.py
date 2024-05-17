@@ -38,8 +38,11 @@ class ProcessViewSet(viewsets.ModelViewSet):
     ordering = ["-created_at"]
 
     def perform_create(self, serializer):
-        return serializer.save(user=self.request.user)
-    
+        user = self.request.user
+        if not user:
+            user = self.request.auth.application.user
+        return serializer.save(user=user)
+
     def list(self, request):
         queryset = Process.objects.all()
         serializer = ProcessSerializerRead(queryset, many=True)
@@ -47,13 +50,13 @@ class ProcessViewSet(viewsets.ModelViewSet):
 
     def retrieve(self, request, pk=None):
         queryset = Process.objects.all()
-        user = get_object_or_404(queryset, pk=pk)
-        serializer = ProcessSerializerRead(user)
+        process = get_object_or_404(queryset, pk=pk)
+        serializer = ProcessSerializerRead(process)
         return Response(serializer.data)
 
     def create(self, request):
         try:
-            pipeline_data = get_pipeline(request.data['pipeline'])
+            pipeline_data = get_pipeline(request.data["pipeline"])
             pipeline = Pipeline(**pipeline_data)
             logger.info("Starting pipeline processing: %s", pipeline.display_name)
             logger.info("Executor is %s.", pipeline.executor)
@@ -62,13 +65,10 @@ class ProcessViewSet(viewsets.ModelViewSet):
             # TODO: Tratar errors individuais
             logger.error(err)
             content = {"error": f"[pipeline loader] {str(err)}"}
-            return Response(
-                content,
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
-            used_config = request.data['used_config']
+            used_config = request.data["used_config"]
             assert validate_config(used_config), f"Bad config -> {used_config}"
             if used_config:
                 used_config = json.loads(used_config)
@@ -81,16 +81,13 @@ class ProcessViewSet(viewsets.ModelViewSet):
             # TODO: Tratar errors individuais
             logger.error(err)
             content = {"error": f"[config loader] {str(err)}"}
-            return Response(
-                content,
-                status=status.HTTP_500_INTERNAL_SERVER_ERROR
-            )
+            return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
 
         try:
             with transaction.atomic():
                 data = {
                     "used_config": json.dumps(used_config),
-                    "pipeline": pipeline.name
+                    "pipeline": pipeline.name,
                 }
                 serializer = self.get_serializer(data=data)
                 serializer.is_valid(raise_exception=True)
@@ -109,7 +106,7 @@ class ProcessViewSet(viewsets.ModelViewSet):
 
                 executor = Executor(instance.pk)
                 task_id = executor.submit()
-            
+
                 process.task_id = task_id
                 process.save()
                 data = self.get_serializer(instance=process).data
@@ -120,7 +117,6 @@ class ProcessViewSet(viewsets.ModelViewSet):
         logger.info("Process[%s] submitted!", str(process))
         return Response(data, status=status.HTTP_201_CREATED)
 
-
     @action(methods=["Post", "Get"], detail=True)
     def status(self, request, **kwargs):
         """Status processing"""
@@ -128,14 +124,13 @@ class ProcessViewSet(viewsets.ModelViewSet):
         try:
             instance = self.get_object()
             process = Process.objects.get(pk=instance.pk)
-            data = {'status': process.get_status_display()}
+            data = {"status": process.get_status_display()}
         except Exception as err:
             content = {"error": str(err)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
         logger.info("Process[%s]: %s", str(process), data)
         return Response(data, status=status.HTTP_200_OK)
-    
 
     @action(methods=["Post", "Get"], detail=True)
     def finish(self, request, **kwargs):
@@ -152,10 +147,9 @@ class ProcessViewSet(viewsets.ModelViewSet):
         except Exception as err:
             data = {"error": str(err)}
             code_status = status.HTTP_500_INTERNAL_SERVER_ERROR
-        
+
         logger.info("Process[%s]: %s", str(process), data)
         return Response(data, status=code_status)
-
 
     @action(methods=["Post", "Get"], detail=True)
     def stop(self, request, **kwargs):
@@ -172,26 +166,21 @@ class ProcessViewSet(viewsets.ModelViewSet):
                 return Response({"message": msg}, status=status.HTTP_200_OK)
 
             if process.status in (0, 5):
-                msg = f"Process[{process}] has already finished. status={process.status}"
+                msg = (
+                    f"Process[{process}] has already finished. status={process.status}"
+                )
                 logger.info(msg)
                 return Response({"message": msg}, status=status.HTTP_200_OK)
 
             Executor = load_executor(process.executor)
             executor = Executor(process.pk)
             executor.stop()
-            process.status = 3    # number representing 'revoking' in db
+            process.status = 3  # number representing 'revoking' in db
             process.save()
             data = self.get_serializer(instance=process).data
         except Exception as err:
             content = {"error": str(err)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
-        
+
         logger.info("Process[%s] marked to be stopped.", str(process))
         return Response(data, status=status.HTTP_200_OK)
-
-    def destroy(self, request, pk=None, *args, **kwargs):
-        instance = self.get_object()
-        if request.user.id == instance.user.pk:
-            return super(ProcessViewSet, self).destroy(request, pk, *args, **kwargs)
-        else:
-            raise exceptions.PermissionDenied()
