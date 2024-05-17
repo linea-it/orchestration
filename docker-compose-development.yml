@@ -19,6 +19,7 @@ services:
       - ./datasets:/datasets # datasets repo
       - ./processes:/processes
       - ./logs:/logs
+      - ./db:/db
     depends_on:
       - rabbitmq
   #    - database

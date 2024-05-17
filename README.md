@@ -9,7 +9,14 @@ Clone the repository and access the directory:
 ```bash
 git clone https://github.com/linea-it/orchestration.git  
 cd orchestration
-mkdir db  # create directory for test database
+```
+
+Create the directory for the database and the file that lists the available pipelines:
+(currently we only have one test pipeline: **cross_lsdb_dev**)
+
+```bash
+mkdir db
+cp pipelines/pipelines.yaml.template pipelines/pipelines.yaml 
 ```
 
 Copy the file `docker-compose-development.yml` and rename to `docker-compose.yml`
@@ -142,7 +149,7 @@ export CREDENTIAL=YXhYU1NCVnV2T3lHVnpoNFB1cnZLYXE1TUhYTW03RnRySGdETWk0dToxZnV2NV
 To start the Client Credential flow you call /token/ endpoint directly:
 
 ```bash
-curl -X POST -H "Authorization: Basic ${CREDENTIAL}" -H "Cache-Control: no-cache" -H "Content-Type: application/x-www-form-urlencoded" "http://localhost/o/token/" -d "grant_type=client_credentials"
+curl -X POST -H "Authorization: Basic ${CREDENTIAL}" -H "Cache-Control: no-cache" -H "Content-Type: application/x-www-form-urlencoded" http://localhost/o/token/ -d "grant_type=client_credentials"
 ```
 
 To be easier to visualize:
@@ -152,7 +159,7 @@ curl -X POST \
     -H "Authorization: Basic ${CREDENTIAL}" \
     -H "Cache-Control: no-cache" \
     -H "Content-Type: application/x-www-form-urlencoded" \
-    "http://localhost/o/token/" \
+    http://localhost/o/token/ \
     -d "grant_type=client_credentials"
 ```
 
@@ -174,7 +181,7 @@ To trigger a 'Cross LSDB' test pipeline processing using the default configurati
 ```bash
 curl -X POST \
     -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
-    "http://localhost/api/processes/" \
+    http://localhost/api/processes/ \
     -d "pipeline=cross_lsdb_dev&used_config="
 ```
 
@@ -183,7 +190,7 @@ To check the processing status, you must pass the process ID:
 ```bash
 curl -X GET \
     -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
-    "http://localhost/api/processes/1/status/" 
+    http://localhost/api/processes/1/status/ 
 ```
 
 To stop processing:
@@ -191,7 +198,7 @@ To stop processing:
 ```bash
 curl -X GET \
     -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
-    "http://localhost/api/processes/1/stop/" 
+    http://localhost/api/processes/1/stop/ 
 ```
 
 
