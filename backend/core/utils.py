@@ -2,6 +2,7 @@ import pathlib
 import yaml
 import json
 import importlib
+import importlib.util
 import sys
 from django.conf import settings
 import logging

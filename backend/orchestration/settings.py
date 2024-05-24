@@ -71,6 +71,8 @@ INSTALLED_APPS = [
     "django_celery_results",
     "oauth2_provider",
     "core",
+    "drf_spectacular",
+    "drf_spectacular_sidecar",
 ]
 
 OAUTH2_PROVIDER = {
@@ -79,10 +81,10 @@ OAUTH2_PROVIDER = {
 }
 
 REST_FRAMEWORK = {
+    "DEFAULT_SCHEMA_CLASS": "drf_spectacular.openapi.AutoSchema",
     "DEFAULT_AUTHENTICATION_CLASSES": (
         "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         "rest_framework.authentication.BasicAuthentication",
-        "rest_framework.authentication.SessionAuthentication",
     ),
     "DEFAULT_PERMISSION_CLASSES": (
         "rest_framework.permissions.IsAuthenticated",
@@ -145,6 +147,12 @@ DATABASES = {
     }
 }
 
+SPECTACULAR_SETTINGS = {
+    'TITLE': 'Orchestration API',
+    'OAUTH2_FLOWS': ['clientCredentials'],
+    'OAUTH2_TOKEN_URL': '/o/token/',
+    'OAUTH2_SCOPES': OAUTH2_PROVIDER.get('SCOPE'),
+}
 
 # Password validation
 # https://docs.djangoproject.com/en/5.0/ref/settings/#auth-password-validators
