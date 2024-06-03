@@ -68,7 +68,7 @@ $ docker-compose run backend python -c "import secrets; print(secrets.token_urls
 6klbHhaeA6J2imKt9AVVgS5yl9mCWoiQqrfUV469DLA
 ```
 
-Copy the generated key and replace the `SECRET` variable value in the `.env` file.
+Copy the generated key, replace the `SECRET_KEY` variable value in the `.env` file and uncomment it by removing the "#".
 
 
 
@@ -107,7 +107,7 @@ The Client Credential grant is suitable for machine-to-machine authentication. Y
 
 Point your browser to <http://localhost/admin/oauth2_provider/application/add/> lets create an application.
 
-- `client_id` and `client_secret` should be left unchanged (copy these two tokens and paste them as the values for variables `DEV_CLIENT_ID` and `DEV_CLIENT_SECRET` inside **.env**).
+- `client_id` and `client_secret` should be left unchanged.
 - `user` should be your superuser numeric ID (if you are the only user, it should be = 1)
 - `redirect_uris` should be left blank
 - `client_type` should be set to confidential
@@ -116,31 +116,47 @@ Point your browser to <http://localhost/admin/oauth2_provider/application/add/> 
 - checkbox for `Skip authorization` should remain unchecked
 - `Algorithm`: keep the default option (No OIDC support)
 
+
+WARNING!!! 
 Fill the form as show in the screenshot below, and before saving take note of **Client id** and **Client secret** we will use it in a minute.
+
 
 ![Adding new application](images/new_app.png)
 
-Export **Client id** and **Client secret** values as environment variable:
+
+With the container running, open a new terminal and export **Client id** and **Client secret** values as environment variable:
 
 ```bash
-export ID=axXSSBVuvOyGVzh4PurvKaq5MHXMm7FtrHgDMi4u
-export SECRET=1fuv5WVfR7A5BlF0o155H7s5bLgXlwWLhi3Y7pdJ9aJuCdl0XV5Cxgd0tri7nSzC80qyrovh8qFXFHgFAAc0ldPNn5ZYLanxSm1SI1rxlRrWUP591wpHDGa3pSpB6dCZ
+export ID=<your Client id >
+export SECRET=<your Client secret>
+```
+For example: 
+
+```bash
+-export ID=axXSSBVuvOyGVzh4PurvKaq5MHXMm7FtrHgDMi4u
+-export SECRET=1fuv5WVfR7A5BlF0o155H7s5bLgXlwWLhi3Y7pdJ9aJuCdl0XV5Cxgd0tri7nSzC80qyrovh8qFXFHgFAAc0ldPNn5ZYLanxSm1SI1rxlRrWUP591wpHDGa3pSpB6dCZ
 ```
 
 The Client Credential flow is simpler than the Authorization Code flow.
 
 We need to encode client_id and client_secret as HTTP base authentication encoded in base64 I use the following code to do that.
 
+Open a Python prompt and execute: 
+ 
 ```python
+import os
 import base64
-client_id="axXSSBVuvOyGVzh4PurvKaq5MHXMm7FtrHgDMi4u"
-secret="1fuv5WVfR7A5BlF0o155H7s5bLgXlwWLhi3Y7pdJ9aJuCdl0XV5Cxgd0tri7nSzC80qyrovh8qFXFHgFAAc0ldPNn5ZYLanxSm1SI1rxlRrWUP591wpHDGa3pSpB6dCZ"
+client_id=os.environ.get('ID') 
+secret=os.environ.get('SECRET') 
 credential="{0}:{1}".format(client_id, secret)
 base64.b64encode(credential.encode("utf-8"))
+``` 
+The credential output should look like this: 
+
+``` 
 b'YXhYU1NCVnV2T3lHVnpoNFB1cnZLYXE1TUhYTW03RnRySGdETWk0dToxZnV2NVdWZlI3QTVCbEYwbzE1NUg3czViTGdYbHdXTGhpM1k3cGRKOWFKdUNkbDBYVjVDeGdkMHRyaTduU3pDODBxeXJvdmg4cUZYRkhnRkFBYzBsZFBObjVaWUxhbnhTbTFTSTFyeGxScldVUDU5MXdwSERHYTNwU3BCNmRDWg=='
 ```
-
-Export the credential as an environment variable
+Exit Python prompt and export the credential as an environment variable (just the string contents), for instance:
 
 ```bash
 export CREDENTIAL=YXhYU1NCVnV2T3lHVnpoNFB1cnZLYXE1TUhYTW03RnRySGdETWk0dToxZnV2NVdWZlI3QTVCbEYwbzE1NUg3czViTGdYbHdXTGhpM1k3cGRKOWFKdUNkbDBYVjVDeGdkMHRyaTduU3pDODBxeXJvdmg4cUZYRkhnRkFBYzBsZFBObjVaWUxhbnhTbTFTSTFyeGxScldVUDU5MXdwSERHYTNwU3BCNmRDWg==
@@ -180,10 +196,19 @@ To trigger a 'Cross LSDB' test pipeline processing using the default configurati
 
 ```bash
 curl -X POST \
+    -H "Authorization: Bearer <your access_token above>" \
+    http://localhost/api/processes/ \
+    -d "pipeline=cross_lsdb_dev&used_config="
+```
+
+For instance: 
+```bash
+curl -X POST \
     -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
     http://localhost/api/processes/ \
     -d "pipeline=cross_lsdb_dev&used_config="
 ```
+
 
 To check the processing status, you must pass the process ID:
 
