@@ -1,0 +1,15 @@
+amqp==5.2.0
+celery==5.3.6
+Django==4.2.13
+django-celery-results==2.5.1
+django-cors-headers==4.3.1
+djangorestframework==3.14.0
+django-celery-beat==2.6.0
+django-oauth-toolkit
+pydantic==2.6.4
+pydantic_core==2.16.3
+PyYAML==6.0.1
+flower==2.0.1
+psutil==5.9.0
+drf-spectacular==0.27.2
+drf-spectacular-sidecar==2024.5.1
