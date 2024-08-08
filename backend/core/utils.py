@@ -10,15 +10,19 @@ import logging
 logger = logging.getLogger()
 
 
-def get_pipeline(name):
+def get_pipelines() -> dict:
     sys_pipes_file = pathlib.Path(settings.PIPELINES_DIR, 'pipelines.yaml')
 
     with open(sys_pipes_file, encoding="utf-8") as _file:
-        system_pipelines = yaml.safe_load(_file)
-        pipeline = system_pipelines.get(name, None)
-        assert pipeline, f"Pipeline {name} not found."
-        pipeline['name'] = name
-        return pipeline
+        return dict(yaml.safe_load(_file))
+
+
+def get_pipeline(name):
+    system_pipelines = get_pipelines() 
+    pipeline = system_pipelines.get(name, None)
+    assert pipeline, f"Pipeline {name} not found."
+    pipeline['name'] = name
+    return pipeline
 
 
 def load_config(schema_path, config={}):
@@ -59,7 +63,7 @@ def validate_json(data):
 
 
 def validate_config(config):
-    if not config: return True
+    if not config or isinstance(config, dict): return True
     return validate_json(config) and isinstance(json.loads(config), dict)
 
 

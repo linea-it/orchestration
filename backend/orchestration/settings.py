@@ -24,11 +24,15 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(
     " "
 )
+# ALLOWED_HOSTS = ["*"]
 
 # https://docs.djangoproject.com/en/4.0/releases/4.0/#csrf-trusted-origins-changes
 CSRF_TRUSTED_ORIGINS = os.getenv(
     "DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost http://127.0.0.1"
 ).split(" ")
+# CSRF_TRUSTED_ORIGINS = ["*"]
+
+CORS_ALLOW_ALL_ORIGINS = True
 
 # https://docs.djangoproject.com/en/4.1/ref/settings/#csrf-cookie-name
 CSRF_COOKIE_NAME = "orchestration.csrftoken"
@@ -36,7 +40,7 @@ CSRF_COOKIE_NAME = "orchestration.csrftoken"
 
 # rabbitmq
 AMQP_HOST = os.getenv("RABBITMQ_HOST", "rabbitmq")
-AMQP_PORT = os.getenv("RABBITMQ_PORT","5672")
+AMQP_PORT = os.getenv("RABBITMQ_PORT", "5672")
 AMQP_USER = os.getenv("RABBITMQ_DEFAULT_USER", "orcadmin")
 AMQP_PASS = os.getenv("RABBITMQ_DEFAULT_PASS", "adminorc")
 AMQP_VHOST = os.getenv("RABBITMQ_DEFAULT_VHOST", "/")
@@ -76,7 +80,7 @@ INSTALLED_APPS = [
 ]
 
 OAUTH2_PROVIDER = {
-    "SCOPES": {'read': 'Read scope', 'write': 'Write scope'},
+    "SCOPES": {"read": "Read scope", "write": "Write scope"},
     "ACCESS_TOKEN_EXPIRE_SECONDS": 36000,
 }
 
@@ -86,9 +90,7 @@ REST_FRAMEWORK = {
         "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "DEFAULT_FILTER_BACKENDS": [
         "rest_framework.filters.SearchFilter",
@@ -96,8 +98,6 @@ REST_FRAMEWORK = {
     ],
     "PAGE_SIZE": 10,
 }
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -148,10 +148,10 @@ DATABASES = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Orchestration API',
-    'OAUTH2_FLOWS': ['clientCredentials'],
-    'OAUTH2_TOKEN_URL': '/o/token/',
-    'OAUTH2_SCOPES': OAUTH2_PROVIDER.get('SCOPE'),
+    "TITLE": "Orchestration API",
+    "OAUTH2_FLOWS": ["clientCredentials"],
+    "OAUTH2_TOKEN_URL": "/o/token/",
+    "OAUTH2_SCOPES": OAUTH2_PROVIDER.get("SCOPE"),
 }
 
 # Password validation
