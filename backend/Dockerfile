@@ -83,16 +83,13 @@ RUN mkdir -p ${BASE_DIR}/django_static \
     ${BASE_DIR}/core/migrations \
     && chmod -R g+w ${BASE_DIR}
 
-# Create groups: for LIneA deploy (39216 lsst) and container
-RUN groupadd --gid 39216 lsst \
-    && groupadd --gid ${GROUPID} $USERNAME
+# Create group
+RUN groupadd --gid ${GROUPID} $USERNAME
 
-# Create users: for LIneA deploy (10013 orchestrator) and container
+# Create user
 RUN useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} 
-RUN useradd --uid 10013 --gid 39216 --shell /bin/bash --create-home orchestrator
-RUN usermod -a -G 39216,900 ${USERNAME} 
-RUN usermod -a -G ${GROUPID},900 orchestrator 
-RUN chown -R 10013:${GROUPID} ${BASE_DIR}
+RUN usermod -a -G ${GROUPID},900 ${USERNAME}
+RUN chown -R ${USERID}:${GROUPID} ${BASE_DIR}
 
 COPY --chmod=0775 ./sh/entrypoint.sh /entrypoint.sh
 

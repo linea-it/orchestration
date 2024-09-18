@@ -21,16 +21,12 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 
 # 'DJANGO_ALLOWED_HOSTS' should be a single string of hosts with a space
 # between each. For example: 'DJANGO_ALLOWED_HOSTS=localhost 127.0.0.1 [::1]'
-ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "localhost 127.0.0.1 [::1]").split(
-    " "
-)
-# ALLOWED_HOSTS = ["*"]
+ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(" ")
 
 # https://docs.djangoproject.com/en/4.0/releases/4.0/#csrf-trusted-origins-changes
 CSRF_TRUSTED_ORIGINS = os.getenv(
-    "DJANGO_CSRF_TRUSTED_ORIGINS", "http://localhost http://127.0.0.1"
+    "DJANGO_CSRF_TRUSTED_ORIGINS", "http://*"
 ).split(" ")
-# CSRF_TRUSTED_ORIGINS = ["*"]
 
 CORS_ALLOW_ALL_ORIGINS = True
 
