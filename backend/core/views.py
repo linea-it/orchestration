@@ -3,7 +3,7 @@ import logging
 import pathlib
 
 from django.shortcuts import get_object_or_404
-from core.utils import get_pipeline, load_config, validate_config, load_executor
+from core.utils import get_pipeline, load_config, validate_config, load_executor, get_pipelines
 from core.pipeline import Pipeline
 from core.models import Process
 from core.serializers import ProcessSerializer, ProcessSerializerRead
@@ -12,6 +12,9 @@ from rest_framework import status, viewsets
 from rest_framework.response import Response
 from rest_framework.decorators import action
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
+from django.conf import settings
+from rest_framework.views import APIView
+from rest_framework.response import Response
 
 
 logger = logging.getLogger("main")
@@ -71,7 +74,8 @@ class ProcessViewSet(viewsets.ModelViewSet):
             used_config = request.data["used_config"]
             assert validate_config(used_config), f"Bad config -> {used_config}"
             if used_config:
-                used_config = json.loads(used_config)
+                if not isinstance(used_config, dict):
+                    used_config = json.loads(used_config)
                 used_config = load_config(pipeline.schema_config, used_config)
             else:
                 used_config = load_config(pipeline.schema_config)
@@ -117,14 +121,18 @@ class ProcessViewSet(viewsets.ModelViewSet):
         logger.info("Process[%s] submitted!", str(process))
         return Response(data, status=status.HTTP_201_CREATED)
 
-    @action(methods=["Post", "Get"], detail=True)
+    @action(methods=["Get"], detail=True)
     def status(self, request, **kwargs):
         """Status processing"""
 
         try:
             instance = self.get_object()
             process = Process.objects.get(pk=instance.pk)
-            data = {"status": process.get_status_display()}
+            data = {
+                "status": process.get_status_display(),
+                "started_at": process.started_at,
+                "ended_at": process.ended_at
+            }
         except Exception as err:
             content = {"error": str(err)}
             return Response(content, status=status.HTTP_500_INTERNAL_SERVER_ERROR)
@@ -132,7 +140,7 @@ class ProcessViewSet(viewsets.ModelViewSet):
         logger.info("Process[%s]: %s", str(process), data)
         return Response(data, status=status.HTTP_200_OK)
 
-    @action(methods=["Post", "Get"], detail=True)
+    @action(methods=["Get"], detail=True)
     def finish(self, request, **kwargs):
         """Finish processing"""
 
@@ -151,7 +159,7 @@ class ProcessViewSet(viewsets.ModelViewSet):
         logger.info("Process[%s]: %s", str(process), data)
         return Response(data, status=code_status)
 
-    @action(methods=["Post", "Get"], detail=True)
+    @action(methods=["Get"], detail=True)
     def stop(self, request, **kwargs):
         """Stop processing"""
 
@@ -184,3 +192,27 @@ class ProcessViewSet(viewsets.ModelViewSet):
 
         logger.info("Process[%s] marked to be stopped.", str(process))
         return Response(data, status=status.HTTP_200_OK)
+
+
+class SystemInformationView(APIView):
+
+    permission_classes = [TokenHasReadWriteScope]
+    http_method_names = ["get",]
+
+    def get(self, request):    
+        data = {
+            'pipelines_dir': settings.PIPELINES_DIR,
+            'processing_dir': settings.PROCESSING_DIR,
+            'datasets_dir': settings.DATASETS_DIR,
+        }
+        return Response(data)
+
+
+class PipelinesView(APIView):
+
+    permission_classes = [TokenHasReadWriteScope]
+    http_method_names = ["get",]
+
+    def get(self, request):    
+        pipelines = get_pipelines()
+        return Response({"pipelines": pipelines})

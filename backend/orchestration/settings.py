@@ -28,6 +28,8 @@ CSRF_TRUSTED_ORIGINS = os.getenv(
     "DJANGO_CSRF_TRUSTED_ORIGINS", "http://*"
 ).split(" ")
 
+CORS_ALLOW_ALL_ORIGINS = True
+
 # https://docs.djangoproject.com/en/4.1/ref/settings/#csrf-cookie-name
 CSRF_COOKIE_NAME = "orchestration.csrftoken"
 
@@ -74,7 +76,7 @@ INSTALLED_APPS = [
 ]
 
 OAUTH2_PROVIDER = {
-    "SCOPES": {'read': 'Read scope', 'write': 'Write scope'},
+    "SCOPES": {"read": "Read scope", "write": "Write scope"},
     "ACCESS_TOKEN_EXPIRE_SECONDS": 36000,
 }
 
@@ -84,9 +86,7 @@ REST_FRAMEWORK = {
         "oauth2_provider.contrib.rest_framework.OAuth2Authentication",
         "rest_framework.authentication.BasicAuthentication",
     ),
-    "DEFAULT_PERMISSION_CLASSES": (
-        "rest_framework.permissions.IsAuthenticated",
-    ),
+    "DEFAULT_PERMISSION_CLASSES": ("rest_framework.permissions.IsAuthenticated",),
     "DEFAULT_PAGINATION_CLASS": "rest_framework.pagination.PageNumberPagination",
     "DEFAULT_FILTER_BACKENDS": [
         "rest_framework.filters.SearchFilter",
@@ -94,8 +94,6 @@ REST_FRAMEWORK = {
     ],
     "PAGE_SIZE": 10,
 }
-
-CORS_ORIGIN_ALLOW_ALL = True
 
 MIDDLEWARE = [
     "corsheaders.middleware.CorsMiddleware",
@@ -146,10 +144,10 @@ DATABASES = {
 }
 
 SPECTACULAR_SETTINGS = {
-    'TITLE': 'Orchestration API',
-    'OAUTH2_FLOWS': ['clientCredentials'],
-    'OAUTH2_TOKEN_URL': '/o/token/',
-    'OAUTH2_SCOPES': OAUTH2_PROVIDER.get('SCOPE'),
+    "TITLE": "Orchestration API",
+    "OAUTH2_FLOWS": ["clientCredentials"],
+    "OAUTH2_TOKEN_URL": "/o/token/",
+    "OAUTH2_SCOPES": OAUTH2_PROVIDER.get("SCOPE"),
 }
 
 # Password validation
