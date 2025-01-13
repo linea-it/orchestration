@@ -9,6 +9,7 @@ class ProcessStatus(models.IntegerChoices):
     STOPPING = 3, "Stopping"
     STOPPED = 4, "Stopped"
     FAILED = 5, "Failed"
+    QUEUED = 6, "Queued"
 
 
 class Process(models.Model):
@@ -29,7 +30,7 @@ class Process(models.Model):
     pid = models.IntegerField(null=True, blank=True)
     status = models.IntegerField(
         verbose_name="Status",
-        default=ProcessStatus.PENDING,
+        default=ProcessStatus.QUEUED,
         choices=ProcessStatus.choices,
     )
     path = models.FilePathField(
