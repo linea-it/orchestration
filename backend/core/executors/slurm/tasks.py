@@ -225,7 +225,7 @@ def update_status(process, status):
     
     status_id = get_status_id(status)
 
-    if status_id:
+    if isinstance(status_id, int):
         process.status = status_id
         process.save()
 
