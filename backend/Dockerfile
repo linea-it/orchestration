@@ -70,6 +70,7 @@ ARG GROUPID=1000
 ARG BASEDIR=/app
 
 ENV BASE_DIR ${BASEDIR}
+ENV LOG_DIR ${LOG_DIR}
 
 RUN mkdir -p ${BASE_DIR}
 
@@ -81,7 +82,7 @@ RUN mkdir -p ${BASE_DIR}/django_static \
     ${BASE_DIR}/django_static/rest_framework \
     ${BASE_DIR}/django_static/admin \
     ${BASE_DIR}/core/migrations \
-    && chmod -R g+w ${BASE_DIR}
+    && chmod -R g+w ${BASE_DIR} 
 
 # Create group
 RUN groupadd --gid ${GROUPID} $USERNAME

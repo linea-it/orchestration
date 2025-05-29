@@ -2,7 +2,7 @@
 
 Orchestration tool for the Brazilian IDAC applications.  
 
-## Setup Develop Enviroment
+## Setup Enviroment
 
 Clone the repository and access the directory:
 
@@ -71,7 +71,6 @@ $ docker-compose run backend python -c "import secrets; print(secrets.token_urls
 Copy the generated key, replace the `SECRET_KEY` variable value in the `.env` file and uncomment it by removing the "#".
 
 
-
 Create the Django superuser.
 
 Enter in container:
@@ -117,7 +116,7 @@ Point your browser to <http://localhost/admin/oauth2_provider/application/add/> 
 - `Algorithm`: keep the default option (No OIDC support)
 
 
-WARNING!!! 
+WARNING!!!
 Fill the form as show in the screenshot below, and before saving take note of **Client id** and **Client secret** we will use it in a minute.
 
 
@@ -258,4 +257,34 @@ Run a terminate on one of the services
 docker-compose exec backend bash
 # with the service turned off
 docker-compose run backend bash
+```
+
+## Setup Slurm Enviroment
+
+### What is it?
+
+Internal application that interacts with the Slurm cluster and must be installed on a submission node. The application is a consumer of rabbitmq, and with each pipeline submission, a Slurm submission file is created and the process is finally submitted.
+
+*note: This installation requires an orchestration running on the same submission node.*
+
+Clone the repository and create a directory that will serve as the base for the application:
+```bash
+git clone https://github.com/linea-it/orchestration.git
+mkdir slurm-worker
+```
+
+Copy the `slurm_env.sh` file and edit the environment variables as needed:
+```bash
+cp orchestration/backend/sh/slurm_env.sh slurm-worker/env.sh
+vi slurm-worker/env.sh    # edit file
+```
+
+With Conda loaded, run:
+```bash
+source slurm-worker/env.sh
+```
+
+And start the application:
+```bash
+slurm_worker_manager start
 ```

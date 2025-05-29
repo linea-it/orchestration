@@ -93,6 +93,12 @@ REST_FRAMEWORK = {
         "rest_framework.filters.OrderingFilter",
     ],
     "PAGE_SIZE": 10,
+    "TEST_REQUEST_DEFAULT_FORMAT": "json",
+    'TEST_REQUEST_RENDERER_CLASSES': [
+        'rest_framework.renderers.MultiPartRenderer',
+        'rest_framework.renderers.JSONRenderer',
+        'rest_framework.renderers.TemplateHTMLRenderer'
+    ]
 }
 
 MIDDLEWARE = [
@@ -193,7 +199,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging settings
 
-LOG_DIR = os.getenv("LOG_DIR", "/logs")
+LOG_DIR = os.getenv("LOG_DIR", "/tmp/logs")
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
 LOGGING = {

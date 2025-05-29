@@ -8,6 +8,25 @@ ENV PYTHONDONTWRITEBYTECODE=1
 # This option has no effect on the stdin stream.
 ENV PYTHONUNBUFFERED=1
 
+RUN apt-get update \
+    && apt-get -y install --no-install-recommends \
+    apt-transport-https \
+    ca-certificates \
+    curl \
+    gnupg2 \
+    software-properties-common \
+   && curl -fsSL https://download.docker.com/linux/debian/gpg | sudo apt-key add - \
+   && add-apt-repository "deb [arch=amd64] https://download.docker.com/linux/debian $(lsb_release -cs) stable" \
+   && apt-get update \
+   && apt-get -y install --no-install-recommends docker-ce \
+   # Clean up
+   && apt-get autoremove -y \
+   && apt-get clean -y \
+   && rm -rf /var/lib/apt/lists/*
+
+# Symlink docker socket
+RUN ln -s "/var/run/docker-host.sock" "/var/run/docker.sock"
+
 # [Optional] If your requirements rarely change, uncomment this section to add them to the image.
 COPY ./backend/requirements.txt /tmp/pip-tmp/
 RUN pip install --upgrade pip wheel setuptools \
