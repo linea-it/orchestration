@@ -11,6 +11,8 @@ services:
       - ./datasets:/datasets # datasets repo
       - ./processes:/processes
       - ./logs:/logs
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
 
     # Overrides default command so things don't shut down after the process ends.
     command: sleep infinity

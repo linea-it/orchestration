@@ -50,8 +50,10 @@
 			]
 		}
 	},
+	"mounts": [
+		"source=/var/run/docker.sock,target=/var/run/docker-host.sock,type=bind"
+	],
 	"containerEnv": {
-		//"PYTHONPATH": "/workspaces/process_api/backend:$PYTHONPATH"
 		"PYTHONPATH": "/workspaces/${localWorkspaceFolderBasename}:$PYTHONPATH"
 	}
 	// Features to add to the dev container. More info: https://containers.dev/features.
