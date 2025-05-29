@@ -30,7 +30,7 @@ jobs:
         pip install -r requirements.txt
     - name: Create log dir
       working-directory: ./backend    
-      run: mkdir -p /logs
+      run: mkdir -p /tmp/logs
     - name: Run tests and collect coverage
       working-directory: ./backend    
       run: pytest --cov=./ --cov-report=xml
