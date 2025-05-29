@@ -199,7 +199,7 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 
 # Logging settings
 
-LOG_DIR = os.getenv("LOG_DIR", "/logs")
+LOG_DIR = os.getenv("LOG_DIR", "/tmp/logs")
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
 LOGGING = {
