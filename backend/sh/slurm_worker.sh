@@ -12,7 +12,7 @@ slurmname="${WORKER_NAME}"
 
 echo "Starting Celery SLURM Worker: ${slurmname} on host ${host}"
 
-rm -rf /tmp/slurm-*.pid
+rm -rf /tmp/${slurmname}-*.pid
 
 celery -A orchestration worker -Q "${slurmname}","${slurmname}"."${host}" \
     -l "${LOGGING_LEVEL}" \
