@@ -8,13 +8,15 @@ host=$(hostname)
 
 sleep 5
 
-echo "Starting Celery SLURM Worker"
+slurmname="${WORKER_NAME}"
+
+echo "Starting Celery SLURM Worker: ${slurmname} on host ${host}"
 
 rm -rf /tmp/slurm-*.pid
 
-celery -A orchestration worker -Q slurm,slurm.${host} \
+celery -A orchestration worker -Q "${slurmname}","${slurmname}"."${host}" \
     -l "${LOGGING_LEVEL}" \
-    --pidfile="/tmp/slurm-%n.pid" \
-    --logfile="${LOG_DIR}/slurm.${host}.log" \
+    --pidfile="/tmp/${slurmname}-%n.pid" \
+    --logfile="${LOG_DIR}/${slurmname}.${host}.log" \
     --pool="solo"
 
