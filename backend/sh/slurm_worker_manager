@@ -77,11 +77,44 @@ stop_slurm_worker() {
         exit 1
     fi
 
-    if kill "$pid"; then
-        rm -f "$PID_FILE"
-        log "INFO" "Slurm worker with PID $pid stopped."
+    log "INFO" "Stopping Slurm worker with PID $pid..."
+    
+    # First, try to kill all child processes (Celery workers)
+    pkill -P "$pid" 2>/dev/null || true
+    
+    # Send SIGTERM to the main process
+    if kill "$pid" 2>/dev/null; then
+        log "INFO" "Sent SIGTERM to PID $pid. Waiting for graceful shutdown..."
+        
+        # Wait up to 30 seconds for graceful shutdown
+        local count=0
+        while ps -p "$pid" > /dev/null 2>&1 && [ $count -lt 30 ]; do
+            sleep 1
+            count=$((count + 1))
+        done
+        
+        # If still running, force kill
+        if ps -p "$pid" > /dev/null 2>&1; then
+            log "WARN" "Process did not stop gracefully. Sending SIGKILL..."
+            kill -9 "$pid" 2>/dev/null || true
+            
+            # Kill any remaining child processes
+            pkill -9 -P "$pid" 2>/dev/null || true
+            
+            # Wait a bit more
+            sleep 2
+        fi
+        
+        # Final check
+        if ps -p "$pid" > /dev/null 2>&1; then
+            log "ERROR" "Failed to stop Slurm worker with PID $pid."
+            exit 1
+        else
+            rm -f "$PID_FILE"
+            log "INFO" "Slurm worker with PID $pid stopped successfully."
+        fi
     else
-        log "ERROR" "Failed to stop Slurm worker with PID $pid."
+        log "ERROR" "Failed to send signal to Slurm worker with PID $pid."
         exit 1
     fi
 }
