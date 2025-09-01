@@ -21,9 +21,6 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     wget \
     python3-dev \
     build-essential \
-    # build-base \
-    libpcre3 \
-    libpcre3-dev \
     && apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /opt/conda \
@@ -42,10 +39,18 @@ ENV PATH /opt/conda/bin:$PATH
 #-------------- Python 3.11 Environment Stage --------------
 FROM base as env_base
 COPY ./environment.yml .
-RUN /bin/bash --login -c "conda init bash \
-    && source ~/.bashrc \
-    && conda env create -f environment.yml \
-    && conda activate orchestration"
+
+# Set environment variable to automatically accept conda TOS
+ENV CONDA_ALWAYS_YES=true
+ENV CONDA_AUTO_ACTIVATE_BASE=false
+
+# Accept conda terms of service using exact commands from error message
+RUN /opt/conda/bin/conda config --set always_yes true && \
+    /opt/conda/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/main && \
+    /opt/conda/bin/conda tos accept --override-channels --channel https://repo.anaconda.com/pkgs/r && \
+    /opt/conda/bin/conda config --set channel_priority flexible && \
+    /opt/conda/bin/conda update -n base -c defaults conda && \
+    /opt/conda/bin/conda env create -f environment.yml
 
 # RUN conda install -c conda-forge uwsgi
 
@@ -82,13 +87,13 @@ RUN mkdir -p ${BASE_DIR}/django_static \
     ${BASE_DIR}/django_static/rest_framework \
     ${BASE_DIR}/django_static/admin \
     ${BASE_DIR}/core/migrations \
-    && chmod -R g+w ${BASE_DIR} 
+    && chmod -R g+w ${BASE_DIR}
 
 # Create group
 RUN groupadd --gid ${GROUPID} $USERNAME
 
 # Create user
-RUN useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME} 
+RUN useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${USERNAME}
 RUN usermod -a -G ${GROUPID},900 ${USERNAME}
 RUN chown -R ${USERID}:${GROUPID} ${BASE_DIR}
 
