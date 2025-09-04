@@ -191,21 +191,14 @@ The OAuth2 provider will return the following response:
 
 And with the access token you will be able to access the endpoints.
 
-To trigger a 'Cross LSDB' test pipeline processing using the default configuration:
+To trigger a pipeline processing:
 
 ```bash
 curl -X POST \
-    -H "Authorization: Bearer <your access_token above>" \
-    http://localhost/api/processes/ \
-    -d "pipeline=cross_lsdb_dev&used_config="
-```
-
-For instance: 
-```bash
-curl -X POST \
-    -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
-    http://localhost/api/processes/ \
-    -d "pipeline=cross_lsdb_dev&used_config="
+  -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
+  -d 'pipeline=predict_occultation' \
+  -d 'used_config={"message": "Hello World", "asteroid_path": "/data/apps/app.orch/dev/pipelines/predict_occultation/process001"}' \
+  http://localhost:8088/api/processes/
 ```
 
 
