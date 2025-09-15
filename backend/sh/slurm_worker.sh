@@ -14,6 +14,8 @@ echo "Starting Celery SLURM Worker: ${slurmname} on host ${host}"
 
 rm -rf /tmp/${slurmname}-*.pid
 
+cd $BASE_DIR/backend
+
 celery -A orchestration worker -Q "${slurmname}","${slurmname}"."${host}" \
     -l "${LOGGING_LEVEL}" \
     --pidfile="/tmp/${slurmname}-%n.pid" \
