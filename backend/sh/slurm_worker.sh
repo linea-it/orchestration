@@ -18,5 +18,6 @@ celery -A orchestration worker -Q "${slurmname}","${slurmname}"."${host}" \
     -l "${LOGGING_LEVEL}" \
     --pidfile="/tmp/${slurmname}-%n.pid" \
     --logfile="${LOG_DIR}/${slurmname}.${host}.log" \
-    --pool="solo"
+    --pool="processes" \
+    --concurrency=2
 

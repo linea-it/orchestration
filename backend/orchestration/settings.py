@@ -45,7 +45,7 @@ AMQP_VHOST = os.getenv("RABBITMQ_DEFAULT_VHOST", "/")
 # Celery Configuration Options
 
 CELERY_BROKER_URL = (
-    f"amqp://{AMQP_USER}:{AMQP_PASS}@{AMQP_HOST}:{AMQP_PORT}{AMQP_VHOST}"
+    f"amqp://{AMQP_USER}:{AMQP_PASS}@{AMQP_HOST}:{AMQP_PORT}/{AMQP_VHOST}"
 )
 CELERY_CACHE_BACKEND = "django-cache"
 CELERY_RESULT_BACKEND = "django-db"

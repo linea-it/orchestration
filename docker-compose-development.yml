@@ -22,22 +22,6 @@ services:
       - ./db:/db
     depends_on:
       - rabbitmq
-  #    - database
-
-  # database:
-  #   image: postgres:13.6-alpine
-  #   env_file:
-  #     - .env
-  #   expose:
-  #     - 5432
-  #   volumes:
-  #     - ./pg_data:/var/lib/postgresql/data
-
-  # celery_slurm_worker: &celery_slurm_worker
-  #   <<: *backend
-  #   command: /app/sh/slurm_worker.sh
-  #   depends_on:
-  #     - backend
 
   celery_local_worker: &celery_local_worker
     <<: *backend
@@ -51,13 +35,13 @@ services:
     depends_on:
       - backend
 
-  celery_flower: &celery_flower
-    <<: *backend
-    command: /app/sh/flower.sh
-    ports:
-      - 5555:5555
-    depends_on:
-      - backend
+  # celery_flower: &celery_flower
+  #   <<: *backend
+  #   command: /app/sh/flower.sh
+  #   ports:
+  #     - 5555:5555
+  #   depends_on:
+  #     - backend
 
   rabbitmq:
     image: "rabbitmq:3.12.12-management"
