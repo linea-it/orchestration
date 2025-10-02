@@ -35,6 +35,35 @@ services:
     depends_on:
       - backend
 
+  celery_slurm_worker: &celery_slurm_worker
+    build:
+      context: ./backend
+      dockerfile: Dockerfile.slurm
+      args:
+        - "USERID=${USERID:-1000}"
+        - "GROUPID=${GROUPID:-1000}"
+        - "USERNAME=${USERNAME:-orcapp}"
+    command: /slurm_worker_container.sh
+    user: "1000:1000"
+    network_mode: "host"  # Compartilha a rede do host para acessar SLURM
+    env_file:
+      - .env
+    environment:
+      - WORKER_NAME=slurm
+      - SLURM_WORKER_CONCURRENCY=2
+    volumes:
+      - ./pipelines:/pipelines
+      - ./datasets:/datasets
+      - ./processes:/processes
+      - ./logs:${LOG_DIR}
+      - ./db:/db
+      # Montar configurações SLURM do host
+      - /etc/slurm:/etc/slurm:ro
+      - /var/spool/slurm:/var/spool/slurm
+    depends_on:
+      - backend
+      - rabbitmq
+
   # celery_flower: &celery_flower
   #   <<: *backend
   #   command: /app/sh/flower.sh
