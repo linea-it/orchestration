@@ -11,13 +11,22 @@ git clone https://github.com/linea-it/orchestration.git
 cd orchestration
 ```
 
-Create the directory for the database and the file that lists the available pipelines:
-(currently we only have one test pipeline: **cross_lsdb_dev**)
+Create the directory for the database and the file that lists the available pipelines. Currently we have:
+    - one test pipeline: **hello_world**
+    - two Pz Server pipelines: **training_set_maker** and **combine_redshift_dedup** (installed separately)
 
 ```bash
 mkdir db
 cp pipelines/pipelines.yaml.template pipelines/pipelines.yaml 
 ```
+
+The default orchestration installation only includes the test pipeline. To install all pipelines:
+
+```bash
+git submodule update --init --recursive
+```
+
+And uncomment the pipelines in the `pipelines/pipelines.yaml` file.
 
 Copy the file `docker-compose-development.yml` and rename to `docker-compose.yml`
 

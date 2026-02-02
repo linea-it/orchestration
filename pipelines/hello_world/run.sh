@@ -9,16 +9,12 @@ fi
 ARGS=$@
 shift $#
 
-if [ ! -d "$DASK_EXECUTOR_KEY" ]; then
-    export DASK_EXECUTOR_KEY=local
-fi
-
 if [ ! -d "$PIPELINES_DIR" ]; then
     echo "Error: PIPELINES_DIR not defined."
     exit 1
 fi
 
-INSTALL_PIPE="$PIPELINES_DIR/cross_lsdb_dev/install.sh"
+INSTALL_PIPE="$PIPELINES_DIR/hello_world/install.sh"
 
 if [ ! -f "$INSTALL_PIPE" ]; then
     echo "Error: Installation script not found."
@@ -32,8 +28,7 @@ echo "Installing pipeline..."
 set -xe
 
 # Run the Python code with the given argument
-# run-crossmatch $ARGS || { echo "Failed to run-crossmatch"; exit 1; }
-run-crossmatch $ARGS
+run-hello_world $ARGS
 
 echo $? >> return.code
 
