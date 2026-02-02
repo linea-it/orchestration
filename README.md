@@ -11,13 +11,22 @@ git clone https://github.com/linea-it/orchestration.git
 cd orchestration
 ```
 
-Create the directory for the database and the file that lists the available pipelines:
-(currently we only have one test pipeline: **cross_lsdb_dev**)
+Create the directory for the database and the file that lists the available pipelines. Currently we have:
+    - one test pipeline: **hello_world**
+    - two Pz Server pipelines: **training_set_maker** and **combine_redshift_dedup** (installed separately)
 
 ```bash
 mkdir db
 cp pipelines/pipelines.yaml.template pipelines/pipelines.yaml 
 ```
+
+The default orchestration installation only includes the test pipeline. To install all pipelines:
+
+```bash
+git submodule update --init --recursive
+```
+
+And uncomment the pipelines in the `pipelines/pipelines.yaml` file.
 
 Copy the file `docker-compose-development.yml` and rename to `docker-compose.yml`
 
@@ -191,13 +200,23 @@ The OAuth2 provider will return the following response:
 
 And with the access token you will be able to access the endpoints.
 
-To trigger a pipeline processing:
+To trigger Hello World pipeline processing:
 
 ```bash
 curl -X POST \
   -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
-  -d 'pipeline=predict_occultation' \
-  -d 'used_config={"message": "Hello World", "asteroid_path": "/data/apps/app.orch/dev/pipelines/predict_occultation/process001"}' \
+  -d 'pipeline=hello_world' \
+  -d 'used_config={"message": "Hello World!"}' \
+  http://localhost:8088/api/processes/
+```
+
+To trigger Training Set Maker pipeline processing:
+
+```bash
+curl -X POST \
+  -H "Authorization: Bearer PaZDOD5UwzbGOFsQr34LQ7JUYOj3yK" \
+  -d 'pipeline=training_set_maker' \
+  -d 'used_config={"inputs": {"dataset": {"path": "/pipelines/training_set_maker/data-example/dr2"},"specz": [{"path": "/pipelines/training_set_maker/data-example/specz.parquet"}]},"output_format": "csv"}' \
   http://localhost:8088/api/processes/
 ```
 

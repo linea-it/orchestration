@@ -1,0 +1,6 @@
+[submodule "pipelines/training_set_maker"]
+	path = pipelines/training_set_maker
+	url = https://github.com/linea-it/pzserver_training_set_maker.git
+[submodule "pipelines/combine_redshift_dedup"]
+	path = pipelines/combine_redshift_dedup
+	url = https://github.com/linea-it/pzserver_combine_redshift_dedup.git
