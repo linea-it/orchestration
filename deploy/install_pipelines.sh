@@ -11,5 +11,5 @@ source $(dirname $CONDA_EXE)/activate || { echo "Failed to activate Conda enviro
 for pipe in $( ls ${PIPELINES_DIR}/*/install.sh)
 do
     echo "Installing: ${pipe}"
-    . "$pipe"
+    bash "$pipe"
 done
