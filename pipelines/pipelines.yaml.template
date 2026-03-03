@@ -13,7 +13,7 @@ hello_world:
 #     runner: 'bash'
 #     executable: 'run.sh'
 #     schema_config: '/pipelines/training_set_maker/config.py'
-#     version: '1.0.0'
+#     version: '1.0.2'
 # combine_redshift_dedup:
 #     display_name: 'Combine Redshift Dedup'
 #     path: '/pipelines/combine_redshift_dedup'
@@ -21,4 +21,4 @@ hello_world:
 #     runner: 'bash'
 #     executable: 'run.sh'
 #     schema_config: '/pipelines/combine_redshift_dedup/config.py'
-#     version: '1.0.0'
+#     version: '1.0.2'
