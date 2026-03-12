@@ -40,9 +40,11 @@ ARG BASEDIR=/app
 
 ENV BASE_DIR ${BASEDIR}
 ENV LOG_DIR ${LOG_DIR}
+ENV ORCHESTRATION_ENV_PREFIX /opt/micromamba/envs/orchestration
+ENV MAMBA_ROOT_PREFIX ${BASEDIR}/.micromamba
 ENV PATH /opt/micromamba/envs/orchestration/bin:/usr/local/bin:/opt/micromamba/bin:$PATH
 
-RUN mkdir -p ${BASE_DIR}
+RUN mkdir -p ${BASE_DIR} ${BASE_DIR}/.micromamba
 
 WORKDIR $BASE_DIR
 COPY . $BASE_DIR
