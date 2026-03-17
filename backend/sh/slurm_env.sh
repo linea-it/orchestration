@@ -2,35 +2,37 @@
 
 export APP_DIR=         # e.g.: /data/apps/app.orch/dev
 export BASE_DIR=        # e.g.: ${APP_DIR}/orchestration
-export CONDA_PATH=      # e.g.: ${APP_DIR}/miniconda3/bin/activate
+export MAMBA_ROOT_PREFIX=   # e.g.: ${APP_DIR}/micromamba
+export MICROMAMBA_BIN=      # e.g.: /usr/local/bin/micromamba
 export RABBITMQ_ENV=    # e.g.: /home/app.orch/rabbitmq/.env
 export WORKER_NAME="slurm"
+export ORCHESTRATION_ENV_NAME="orchestration"
 
 set -a
-. $RABBITMQ_ENV         # environment variables related to rabbitmq running on srvorch-dev server
-. $BASE_DIR/.env
+. "$RABBITMQ_ENV"
+. "$BASE_DIR/.env"
 set +a
 
-echo "Activating environment"
+MICROMAMBA_BIN="${MICROMAMBA_BIN:-micromamba}"
+MAMBA_ROOT_PREFIX="${MAMBA_ROOT_PREFIX:-${APP_DIR}/micromamba}"
+ENV_PREFIX="${MAMBA_ROOT_PREFIX}/envs/${ORCHESTRATION_ENV_NAME}"
 
-# shellcheck source=/data/apps/app.orch/dev/miniconda3/bin/activate
-source $CONDA_PATH || { echo "Failed to activate Conda environment"; exit 1; }
+if ! command -v "$MICROMAMBA_BIN" >/dev/null 2>&1; then
+    echo "Failed to find micromamba in PATH. Set MICROMAMBA_BIN or update PATH."
+    exit 1
+fi
 
 if [ ! -d "$PIPELINES_DIR" ]; then
     echo "Error: PIPELINES_DIR not defined."
     exit 1
 fi
 
-HASENV=$(conda env list | grep 'orchestration ')
-
-if [ -z "$HASENV" ]; then
+if [ ! -d "$ENV_PREFIX" ]; then
     echo "Create virtual environment..."
-    conda env create -f $BASE_DIR/backend/environment.yml
+    "$MICROMAMBA_BIN" create --root-prefix "$MAMBA_ROOT_PREFIX" -y -f "$BASE_DIR/backend/environment.yml"
     echo "Virtual environment created and packages installed."
 fi
 
-conda activate orchestration
-
-export PATH=$PATH:$BASE_DIR/backend/sh/
+export PATH="$ENV_PREFIX/bin:$BASE_DIR/backend/sh/:$PATH"
 
 umask g+w

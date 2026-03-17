@@ -6,7 +6,11 @@ fi
 
 echo "The directory containing the pipelines is: " "$PIPELINES_DIR"
 
-source $(dirname $CONDA_EXE)/activate || { echo "Failed to activate Conda environment"; exit 1; }
+MICROMAMBA_BIN="${MICROMAMBA_BIN:-micromamba}"
+if ! command -v "$MICROMAMBA_BIN" >/dev/null 2>&1; then
+    echo "Failed to find micromamba in PATH"
+    exit 1
+fi
 
 for pipe in $( ls ${PIPELINES_DIR}/*/install.sh)
 do

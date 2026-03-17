@@ -291,10 +291,12 @@ cp orchestration/backend/sh/slurm_env.sh slurm-worker/env.sh
 vi slurm-worker/env.sh    # edit file
 ```
 
-With Conda loaded, run:
+With `micromamba` available in `PATH`, run:
 ```bash
 source slurm-worker/env.sh
 ```
+
+The script defaults to `MAMBA_ROOT_PREFIX=${APP_DIR}/micromamba` and will create the `orchestration` environment there if it does not exist.
 
 And start the application:
 ```bash
