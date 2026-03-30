@@ -22,3 +22,11 @@ hello_world:
 #     executable: 'run.sh'
 #     schema_config: '/pipelines/combine_redshift_dedup/config.py'
 #     version: '1.0.2'
+# science_catalogs:
+#     display_name: 'Science Catalogs'
+#     path: '/pipelines/science_catalogs'
+#     executor: 'local' # only to orchestration
+#     runner: 'bash'
+#     executable: 'run.sh'
+#     schema_config: '/pipelines/science_catalogs/config.py'
+#     version: '0.0.1'

@@ -4,3 +4,6 @@
 [submodule "pipelines/combine_redshift_dedup"]
 	path = pipelines/combine_redshift_dedup
 	url = https://github.com/linea-it/pzserver_combine_redshift_dedup.git
+[submodule "pipelines/science_catalogs"]
+	path = pipelines/science_catalogs
+	url = https://github.com/linea-it/science_catalogs_core
