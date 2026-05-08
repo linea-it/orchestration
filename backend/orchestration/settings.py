@@ -11,6 +11,8 @@ https://docs.djangoproject.com/en/5.0/ref/settings/
 """
 
 import os
+import time
+import logging
 from pathlib import Path
 
 # Build paths inside the project like this: BASE_DIR / 'subdir'.
@@ -24,9 +26,7 @@ BASE_DIR = Path(__file__).resolve().parent.parent
 ALLOWED_HOSTS = os.getenv("DJANGO_ALLOWED_HOSTS", "*").split(" ")
 
 # https://docs.djangoproject.com/en/4.0/releases/4.0/#csrf-trusted-origins-changes
-CSRF_TRUSTED_ORIGINS = os.getenv(
-    "DJANGO_CSRF_TRUSTED_ORIGINS", "http://*"
-).split(" ")
+CSRF_TRUSTED_ORIGINS = os.getenv("DJANGO_CSRF_TRUSTED_ORIGINS", "http://*").split(" ")
 
 CORS_ALLOW_ALL_ORIGINS = True
 
@@ -94,11 +94,11 @@ REST_FRAMEWORK = {
     ],
     "PAGE_SIZE": 10,
     "TEST_REQUEST_DEFAULT_FORMAT": "json",
-    'TEST_REQUEST_RENDERER_CLASSES': [
-        'rest_framework.renderers.MultiPartRenderer',
-        'rest_framework.renderers.JSONRenderer',
-        'rest_framework.renderers.TemplateHTMLRenderer'
-    ]
+    "TEST_REQUEST_RENDERER_CLASSES": [
+        "rest_framework.renderers.MultiPartRenderer",
+        "rest_framework.renderers.JSONRenderer",
+        "rest_framework.renderers.TemplateHTMLRenderer",
+    ],
 }
 
 MIDDLEWARE = [
@@ -202,6 +202,13 @@ DEFAULT_AUTO_FIELD = "django.db.models.BigAutoField"
 LOG_DIR = os.getenv("LOG_DIR", "/tmp/logs")
 LOGGING_LEVEL = os.getenv("LOGGING_LEVEL", "INFO")
 
+
+class LocalTimeFormatter(logging.Formatter):
+    """Formatter that renders asctime using local server time."""
+
+    converter = time.localtime
+
+
 LOGGING = {
     "version": 1,
     "disable_existing_loggers": False,
@@ -238,7 +245,9 @@ LOGGING = {
     },
     "formatters": {
         "standard": {
+            "()": LocalTimeFormatter,
             "format": "%(asctime)s [%(levelname)s] %(message)s",
+            "datefmt": "%Y-%m-%d %H:%M:%S",
         },
     },
 }
