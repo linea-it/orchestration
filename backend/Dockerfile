@@ -8,7 +8,7 @@ RUN groupadd -r mamba --gid 900
 
 RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
     && apt-get -y install --no-install-recommends \
-    procps gcc ca-certificates wget bzip2 python3-dev build-essential && \
+    procps gcc ca-certificates wget bzip2 python3-dev build-essential tzdata && \
     apt-get clean \
     && rm -rf /var/lib/apt/lists/* \
     && mkdir -p /opt/micromamba \
