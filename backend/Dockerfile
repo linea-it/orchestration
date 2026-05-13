@@ -1,4 +1,4 @@
-FROM python:3.11-slim as base
+FROM python:3.11-slim AS base
 
 ENV PYTHONDONTWRITEBYTECODE=1
 ENV PYTHONUNBUFFERED=1
@@ -18,7 +18,7 @@ RUN apt-get update && export DEBIAN_FRONTEND=noninteractive \
 
 ENV PATH /usr/local/bin:/opt/micromamba/bin:$PATH
 
-FROM base as env_base
+FROM base AS env_base
 COPY ./environment.yml .
 
 RUN micromamba create --root-prefix "$MAMBA_ROOT_PREFIX" -y -f environment.yml \
