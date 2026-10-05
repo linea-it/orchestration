@@ -40,3 +40,24 @@ class ProcessSerializerRead(ProcessSerializer):
         config = obj.used_config
         if not config: return dict()
         return json.loads(config)
+
+
+class ReleaseHatsConfigQuerySerializer(serializers.Serializer):
+    release = serializers.CharField(required=False, allow_blank=False, max_length=255)
+
+
+class ReleaseHatsConfigSummarySerializer(serializers.Serializer):
+    release = serializers.CharField()
+    last_modified = serializers.DateTimeField()
+
+
+class ReleaseHatsConfigSerializer(ReleaseHatsConfigSummarySerializer):
+    config = serializers.JSONField()
+
+
+class ReleaseHatsConfigListSerializer(serializers.Serializer):
+    results = ReleaseHatsConfigSummarySerializer(many=True)
+
+
+class ReleaseHatsConfigErrorSerializer(serializers.Serializer):
+    error = serializers.CharField()

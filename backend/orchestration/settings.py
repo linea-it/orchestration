@@ -269,3 +269,8 @@ PIPELINES_DIR = os.getenv("PIPELINES_DIR", "/pipelines")
 
 # directory where it will contain the datasets.
 DATASETS_DIR = os.getenv("DATASETS_DIR", "/datasets")
+
+# Name and maximum size of the release HATS manifest stored in each dataset
+# directory: <DATASETS_DIR>/<release>/<HATS_CONFIG_FILENAME>.
+HATS_CONFIG_FILENAME = os.getenv("HATS_CONFIG_FILENAME", "hats_config.yaml")
+HATS_CONFIG_MAX_SIZE = int(os.getenv("HATS_CONFIG_MAX_SIZE", 1024 * 1024))

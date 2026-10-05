@@ -31,7 +31,8 @@ RUN micromamba run --root-prefix "$MAMBA_ROOT_PREFIX" -n orchestration pip insta
 
 FROM base
 
-COPY --chown=:mamba --chmod=775 --from=env_base /opt/micromamba/envs/orchestration /opt/micromamba/envs/orchestration
+COPY --chown=0:900 --from=env_base /opt/micromamba/envs/orchestration /opt/micromamba/envs/orchestration
+RUN chmod -R 775 /opt/micromamba/envs/orchestration
 
 ARG USERNAME=orch
 ARG USERID=1000
@@ -60,7 +61,8 @@ RUN useradd --uid ${USERID} --gid ${GROUPID} --shell /bin/bash --create-home ${U
 RUN usermod -a -G ${GROUPID},900 ${USERNAME}
 RUN chown -R ${USERID}:${GROUPID} ${BASE_DIR}
 
-COPY --chmod=0775 ./sh/entrypoint.sh /entrypoint.sh
+COPY ./sh/entrypoint.sh /entrypoint.sh
+RUN chmod 0775 /entrypoint.sh
 
 USER $USERNAME
 RUN /bin/bash -lc "echo 'source ${BASE_DIR}/sh/env.sh' >> ~/.bashrc"
