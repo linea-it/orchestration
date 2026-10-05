@@ -1,6 +1,11 @@
 from django.urls import path, include
 from django.contrib import admin
-from core.views import ProcessViewSet, PipelinesView, SystemInformationView
+from core.views import (
+    PipelinesView,
+    ProcessViewSet,
+    ReleaseHatsConfigView,
+    SystemInformationView,
+)
 from rest_framework import routers
 from drf_spectacular.views import (
     SpectacularAPIView,
@@ -13,6 +18,11 @@ route.register(r"processes", ProcessViewSet, basename="processes")
 
 urlpatterns = [
     path("api/pipelines/", PipelinesView.as_view()),
+    path(
+        "api/releases/hats_config/",
+        ReleaseHatsConfigView.as_view(),
+        name="release-hats-config",
+    ),
     path("api/sysinfo/", SystemInformationView.as_view()),
     path("api/schema/", SpectacularAPIView.as_view(), name="schema"),
     path(

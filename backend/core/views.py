@@ -6,7 +6,15 @@ from django.shortcuts import get_object_or_404
 from core.utils import get_pipeline, load_config, validate_config, load_executor, get_pipelines
 from core.pipeline import Pipeline
 from core.models import Process
-from core.serializers import ProcessSerializer, ProcessSerializerRead
+from core.release_config import ReleaseHatsConfigError, ReleaseHatsConfigRegistry
+from core.serializers import (
+    ProcessSerializer,
+    ProcessSerializerRead,
+    ReleaseHatsConfigErrorSerializer,
+    ReleaseHatsConfigListSerializer,
+    ReleaseHatsConfigQuerySerializer,
+    ReleaseHatsConfigSerializer,
+)
 from django.db import transaction
 from rest_framework import status, viewsets
 from rest_framework.response import Response
@@ -14,7 +22,12 @@ from rest_framework.decorators import action
 from oauth2_provider.contrib.rest_framework import TokenHasReadWriteScope
 from django.conf import settings
 from rest_framework.views import APIView
-from rest_framework.response import Response
+from drf_spectacular.utils import (
+    OpenApiParameter,
+    OpenApiResponse,
+    PolymorphicProxySerializer,
+    extend_schema,
+)
 
 
 logger = logging.getLogger("main")
@@ -206,6 +219,66 @@ class SystemInformationView(APIView):
             'datasets_dir': settings.DATASETS_DIR,
         }
         return Response(data)
+
+
+class ReleaseHatsConfigView(APIView):
+    """Expose HATS manifests stored alongside datasets."""
+
+    permission_classes = [TokenHasReadWriteScope]
+    http_method_names = ["get", "head", "options"]
+
+    @extend_schema(
+        parameters=[
+            OpenApiParameter(
+                name="release",
+                type=str,
+                location=OpenApiParameter.QUERY,
+                required=False,
+                description=(
+                    "Release identifier. When omitted, only summaries for the "
+                    "available release configurations are returned."
+                ),
+            )
+        ],
+        responses={
+            200: PolymorphicProxySerializer(
+                component_name="ReleaseHatsConfigResponse",
+                serializers=[
+                    ReleaseHatsConfigSerializer,
+                    ReleaseHatsConfigListSerializer,
+                ],
+                resource_type_field_name=None,
+            ),
+            400: ReleaseHatsConfigErrorSerializer,
+            404: ReleaseHatsConfigErrorSerializer,
+            413: ReleaseHatsConfigErrorSerializer,
+            422: ReleaseHatsConfigErrorSerializer,
+            500: OpenApiResponse(description="Unexpected server error."),
+        },
+    )
+    def get(self, request):
+        query_data = (
+            {"release": request.query_params.get("release")}
+            if "release" in request.query_params
+            else {}
+        )
+        query = ReleaseHatsConfigQuerySerializer(data=query_data)
+        if not query.is_valid():
+            error = query.errors.get("release", ["Invalid query parameters."])[0]
+            return Response({"error": str(error)}, status=status.HTTP_400_BAD_REQUEST)
+        release = query.validated_data.get("release")
+        registry = ReleaseHatsConfigRegistry()
+
+        try:
+            if release:
+                data = registry.get(release)
+                return Response(ReleaseHatsConfigSerializer(data).data)
+
+            data = {"results": registry.list()}
+            return Response(ReleaseHatsConfigListSerializer(data).data)
+        except ReleaseHatsConfigError as exc:
+            logger.warning("Release HATS configuration request failed: %s", exc)
+            return Response({"error": str(exc)}, status=exc.status_code)
 
 
 class PipelinesView(APIView):

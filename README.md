@@ -200,6 +200,54 @@ The OAuth2 provider will return the following response:
 
 And with the access token you will be able to access the endpoints.
 
+### Release HATS configurations
+
+Release-specific HATS configuration is stored alongside each dataset instead
+of in the orchestration database. The default convention is:
+
+```text
+<DATASETS_DIR>/<release>/hats_config.yaml
+```
+
+For example, `/datasets/dp1/hats_config.yaml` contains the configuration in the
+same format consumed by `science_catalogs`, without an API envelope:
+
+```yaml
+input:
+  catalog_folder: /datasets/dp1/catalogs
+  which_release: LSST_DP1
+dust:
+  path_to_dustmaps: /datasets/dustmaps
+  use_dustmap: sfd
+cluster:
+  executor: local
+```
+
+The release is inferred from the parent directory. The file does not need to
+duplicate it or declare a `schema_version`.
+
+Retrieve a release manifest with:
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  "http://localhost:8088/api/releases/hats_config/?release=dp1"
+```
+
+The response wraps the parsed YAML in `config` and adds the release inferred
+from the request and its modification time. Omitting the `release` query
+parameter returns summaries for all direct children of `DATASETS_DIR` that
+contain a configuration:
+
+```bash
+curl -X GET \
+  -H "Authorization: Bearer ${ACCESS_TOKEN}" \
+  "http://localhost:8088/api/releases/hats_config/"
+```
+
+The manifest file name and maximum accepted size can be configured through
+`HATS_CONFIG_FILENAME` and `HATS_CONFIG_MAX_SIZE`.
+
 To trigger Hello World pipeline processing:
 
 ```bash
