@@ -213,18 +213,20 @@ For example, `/datasets/dp1/hats_config.yaml` contains the configuration in the
 same format consumed by `science_catalogs`, without an API envelope:
 
 ```yaml
+metadata:
+  release: LSST_DP1
 input:
-  catalog_folder: /datasets/dp1/catalogs
-  which_release: LSST_DP1
+  catalog_path: /datasets/dp1/catalogs
 dust:
   path_to_dustmaps: /datasets/dustmaps
   use_dustmap: sfd
-cluster:
+execution:
   executor: local
 ```
 
-The release is inferred from the parent directory. The file does not need to
-duplicate it or declare a `schema_version`.
+The parent directory selects the release served by the orchestration. The
+`metadata.release` field belongs to the `science_catalogs` configuration; no
+additional API envelope or `schema_version` is required.
 
 Retrieve a release manifest with:
 
