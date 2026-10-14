@@ -40,12 +40,21 @@ class ReleaseHatsConfigTestMixin:
         if raw is None:
             if document is None:
                 document = {
+                    "metadata": {"release": release},
                     "input": {
-                        "which_release": release,
-                        "compute_magnitude": True,
+                        "catalog_path": f"/datasets/{release}",
+                    },
+                    "photometry": {
+                        "measurements": [
+                            {
+                                "name": "cModel",
+                                "input": {"type": "flux"},
+                                "output": {"type": "mag_dered"},
+                            }
+                        ]
                     },
                     "dust": {"use_dustmap": "sfd"},
-                    "cluster": {"executor": "local"},
+                    "execution": {"executor": "local"},
                 }
             raw = yaml.safe_dump(document, sort_keys=False)
         config_path.write_text(raw, encoding="utf-8")
@@ -62,7 +71,11 @@ class ReleaseHatsConfigRegistryTestCase(
         result = ReleaseHatsConfigRegistry().get("dp1")
 
         self.assertEqual("dp1", result["release"])
-        self.assertEqual("dp1", result["config"]["input"]["which_release"])
+        self.assertEqual("dp1", result["config"]["metadata"]["release"])
+        self.assertEqual(
+            "/datasets/dp1",
+            result["config"]["input"]["catalog_path"],
+        )
         self.assertEqual("sfd", result["config"]["dust"]["use_dustmap"])
         self.assertIsNotNone(result["last_modified"].tzinfo)
 
@@ -94,7 +107,7 @@ class ReleaseHatsConfigRegistryTestCase(
             outside_release = Path(outside_tempdir) / "external"
             outside_release.mkdir()
             (outside_release / "hats_config.yaml").write_text(
-                yaml.safe_dump({"input": {"which_release": "linked"}}),
+                yaml.safe_dump({"metadata": {"release": "linked"}}),
                 encoding="utf-8",
             )
             (self.datasets_dir / "linked").symlink_to(
